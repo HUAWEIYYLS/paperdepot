@@ -39,6 +39,18 @@ git push origin vX.Y.Z
 4. `npm pack` 并把 `paperdepot-X.Y.Z.tgz` 作为 GitHub Release 附件。
 5. 用 GitHub 自动生成的 release notes。
 
+**发布后更新市场索引**（`market/index.json` 是「发现」页可添加的自定义索引源，里面写死了版本与提交）：
+
+```powershell
+node scripts/build-market-index.mjs
+git add market/index.json
+git commit -m "chore: 更新市场索引 vX.Y.Z"
+git push origin main
+```
+
+索引里的 `version` 取 `package.json`、`commit` 取当前 HEAD、`publishTimestamp` 取提交时间；
+脚本会按 DSH format 1 的规则自检。索引来源目前是 Git（固定提交），npm 发布后可以改成 npm 源。
+
 > 首次发布需在 npm 上创建包并配置 `NPM_TOKEN`（Automation token，勾选 publish 权限）。
 > 若没有 npm 账号，可先只发 GitHub Release tarball：`release.yml` 在 `NPM_TOKEN` 为空时会
 > 跳过 npm 发布步骤，其余步骤照常执行；npm/市场后续补。

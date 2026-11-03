@@ -76,6 +76,7 @@
     "test:python": "python -m pytest -q",
     "check:package": "node tests/check-package.mjs",
     "check:paths": "node tests/check-paths.mjs",
+    "build:market": "node scripts/build-market-index.mjs",
     "pack:pipeline": "node scripts/pack-pipeline.mjs",
     "prepack": "node scripts/pack-pipeline.mjs"
   }

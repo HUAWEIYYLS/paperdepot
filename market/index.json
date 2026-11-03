@@ -1,0 +1,90 @@
+{
+  "format": 1,
+  "title": {
+    "en": "PaperDepot plugin market",
+    "zh-cn": "论文库（PaperDepot）插件索引"
+  },
+  "description": {
+    "en": "Self-hosted DSH plugin market index for PaperDepot.",
+    "zh-cn": "PaperDepot 自建的 DSH 插件索引，只收录本插件。"
+  },
+  "metadata": {
+    "categories": {
+      "papers": {
+        "title": {
+          "en": "Papers & literature",
+          "zh-cn": "论文与文献"
+        }
+      }
+    },
+    "labels": {
+      "dsh": {
+        "title": {
+          "en": "DSH plugin",
+          "zh-cn": "DSH 插件"
+        }
+      },
+      "obsidian": {
+        "title": {
+          "en": "Obsidian",
+          "zh-cn": "Obsidian"
+        }
+      },
+      "mineru": {
+        "title": {
+          "en": "MinerU",
+          "zh-cn": "MinerU"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "paperdepot",
+      "title": {
+        "en": "PaperDepot (论文库)",
+        "zh-cn": "论文库（PaperDepot）"
+      },
+      "description": {
+        "en": "Turn PDF papers into a searchable, readable, connected Obsidian paper library. DSH plugin.",
+        "zh-cn": "把 PDF 论文变成可检索、可读、可连接的 Obsidian 论文库。DSH 插件，不依赖 Zotero。"
+      },
+      "author": "HUAWEIYYLS",
+      "homepage": "https://github.com/HUAWEIYYLS/paperdepot#readme",
+      "repository": {
+        "url": "https://github.com/HUAWEIYYLS/paperdepot"
+      },
+      "metadata": {
+        "category": "papers",
+        "keywords": [
+          "dsh",
+          "dsh-plugin",
+          "obsidian",
+          "paper",
+          "pdf",
+          "mineru",
+          "literature"
+        ],
+        "labels": [
+          "dsh",
+          "obsidian",
+          "mineru"
+        ]
+      },
+      "versions": [
+        {
+          "version": "0.1.0",
+          "publishTimestamp": 1793679055,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/HUAWEIYYLS/paperdepot",
+            "commit": "8c43bb3e7ea5837a2dc1de7ee6f28eacdc59eebd"
+          },
+          "engines": {
+            "dsh": ">=0.2.1-rc.1 <0.3.0"
+          }
+        }
+      ]
+    }
+  ]
+}

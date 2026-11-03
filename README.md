@@ -91,6 +91,19 @@ pnpm add "link:D:\path\to\paperdepot"
 > **重要**：profile 里的 `name:` 必须是包名 `paperdepot`，不能写 `paperdepot/host`。
 > 写子路径会出现「host 正常、左侧栏没有论文库」。
 
+### 方式 E：DSH「发现」页的自定义索引源（可选）
+
+DSH 目前**没有官方插件市场**：开箱的「发现」页默认没有任何索引源，直接搜不到任何第三方插件。
+本仓库自带一个自建索引（`market/index.json`），加上它就能在「发现」页搜到并一键安装：
+
+1. DSH 侧栏 → **插件** → **实验性插件**旁的**更多** → 启用**自定义插件市场**；
+2. 插件页 → **发现** → **添加索引源** → 粘贴：
+   `https://raw.githubusercontent.com/HUAWEIYYLS/paperdepot/main/market/index.json`
+3. 在搜索框搜「论文库」或 `paperdepot` → 安装（索引里只有本插件，来源是 GitHub 提交）。
+
+> 这个索引只收录 PaperDepot 自己，属于自建源；别人要搜到，得先添加这个 URL。
+> 索引格式与校验器是 DSH 官方的 format 1（`@deepseek-ai/dsh-plugin-market-index`）。
+
 ## 首次配置
 
 打开左侧栏「论文库」面板，第一次会看到配置卡：
