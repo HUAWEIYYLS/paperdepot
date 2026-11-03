@@ -74,11 +74,11 @@
       "versions": [
         {
           "version": "0.1.0",
-          "publishTimestamp": 1793679055,
+          "publishTimestamp": 1793683177,
           "source": {
             "type": "git",
             "url": "https://github.com/HUAWEIYYLS/paperdepot",
-            "commit": "8c43bb3e7ea5837a2dc1de7ee6f28eacdc59eebd"
+            "commit": "d9122dc35d9f160afa6dc8d1f985f8198d6e3aff"
           },
           "engines": {
             "dsh": ">=0.2.1-rc.1 <0.3.0"
