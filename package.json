@@ -78,6 +78,7 @@
     "check:paths": "node tests/check-paths.mjs",
     "build:market": "node scripts/build-market-index.mjs",
     "pack:pipeline": "node scripts/pack-pipeline.mjs",
+    "prepare": "node scripts/pack-pipeline.mjs",
     "prepack": "node scripts/pack-pipeline.mjs"
   }
 }
