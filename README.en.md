@@ -29,6 +29,8 @@ It handles ingestion and organization; Obsidian only stores and reads.
 
 1. Install DSH Desktop and create/open an Obsidian vault (keep the path short).
 2. Install the plugin (GitHub Release tarball, npm, or DSH plugin market when listed).
+   Prefer not to run commands yourself? Hand the
+   [one-prompt installer](https://github.com/HUAWEIYYLS/paperdepot/blob/main/docs/install-prompt.md) to DSH.
 3. Get a MinerU token at <https://mineru.net>.
 4. Open the **论文库** panel in DSH, paste the token, verify it, and choose your vault.
 5. Drop a PDF into the panel and open the generated entry in Obsidian.

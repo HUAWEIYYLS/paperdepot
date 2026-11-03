@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `docs/install-prompt.md`：一键安装提示词与日常使用提示词，可整段交给 DSH 自动完成安装与配置；
+  README / README.en 增加入口。
+
 ## [0.1.0] - 2026-11-03
 
 ### Added

@@ -30,7 +30,8 @@ PDF
 ## 5 分钟快速开始
 
 1. **准备 DSH + Obsidian**：安装 DSH 桌面版，并在 Obsidian 里新建或打开一个库（路径尽量短）。
-2. **安装插件**：任选下面一种方式（初次使用推荐 GitHub Release tarball）。
+2. **安装插件**：任选下面一种方式（初次使用推荐 GitHub Release tarball）；
+   不想手动敲命令，就把[一键安装提示词](https://github.com/HUAWEIYYLS/paperdepot/blob/main/docs/install-prompt.md)整段发给 DSH。
 3. **申请 MinerU Token**：打开 <https://mineru.net> 注册 → 控制台 → API 管理 → 创建 Token。
 4. **首次配置**：打开左侧栏「论文库」→ 配置卡里粘贴 Token → 保存并验证 → 选择 Obsidian 库路径。
 5. **导入第一篇**：把 PDF 拖进面板 → 看实时日志 → 打开 Obsidian 的 `1-Papers/<标题>/index.md`。
@@ -39,6 +40,9 @@ PDF
 > **涉密、未发表或不允许上传的稿件请不要导入。**
 
 ## 安装
+
+> 完全不想手动操作？把[一键安装提示词](https://github.com/HUAWEIYYLS/paperdepot/blob/main/docs/install-prompt.md)
+> 复制给 DSH，它会自己定位 profile、装包、写 `cordis.patch.yml`、装 Python 依赖并做安装后验证。
 
 ### 方式 A：DSH 插件市场（收录后推荐）
 
