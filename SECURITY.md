@@ -10,7 +10,7 @@
 ## Reporting a vulnerability
 
 **不要公开提 issue。** 请通过 GitHub 的
-[私密安全公告](https://github.com/OWNER/paperdepot/security/advisories/new)
+[私密安全公告](https://github.com/HUAWEIYYLS/paperdepot/security/advisories/new)
 报告，或发邮件到维护者邮箱（在 GitHub 个人资料里）。
 
 请在报告里包含：

@@ -77,7 +77,7 @@ pnpm add "D:\downloads\paperdepot-0.1.0.tgz"
 ### 方式 D：源码 link（开发 / 调试）
 
 ```powershell
-git clone https://github.com/OWNER/paperdepot.git
+git clone https://github.com/HUAWEIYYLS/paperdepot.git
 cd "$env:USERPROFILE\.dsh\profiles\desktop"
 pnpm add "link:D:\path\to\paperdepot"
 ```
@@ -223,5 +223,3 @@ pnpm add "link:D:\path\to\paperdepot"
 ## 许可证
 
 MIT。第三方依赖与商标声明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
-
-> 仓库地址、徽章、Release 链接中的 `OWNER` 会在创建 GitHub 仓库后替换。

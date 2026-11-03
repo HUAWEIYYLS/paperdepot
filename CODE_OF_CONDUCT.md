@@ -15,8 +15,8 @@
 
 ## 执行
 
-如果你遇到违反准则的行为，请通过 GitHub 联系维护者（`@OWNER`），或使用
-[私密安全公告](https://github.com/OWNER/paperdepot/security/advisories/new)。
+如果你遇到违反准则的行为，请通过 GitHub 联系维护者（`@HUAWEIYYLS`），或使用
+[私密安全公告](https://github.com/HUAWEIYYLS/paperdepot/security/advisories/new)。
 维护者会尽快处理，并保护报告者隐私。
 
 可能的处理：提醒、删除内容、关闭讨论、临时或永久禁止参与。

@@ -35,12 +35,13 @@ git push origin vX.Y.Z
 
 1. 校验 tag 与 `package.json` 版本一致。
 2. 跑 selftest / package check / paths check。
-3. `npm publish --access public --provenance`（使用仓库 secret `NPM_TOKEN`）。
+3. `npm publish --access public --provenance`（使用仓库 secret `NPM_TOKEN`；未配置则自动跳过）。
 4. `npm pack` 并把 `paperdepot-X.Y.Z.tgz` 作为 GitHub Release 附件。
 5. 用 GitHub 自动生成的 release notes。
 
 > 首次发布需在 npm 上创建包并配置 `NPM_TOKEN`（Automation token，勾选 publish 权限）。
-> 若没有 npm 账号，可先只发 GitHub Release tarball；npm/市场后续补。
+> 若没有 npm 账号，可先只发 GitHub Release tarball：`release.yml` 在 `NPM_TOKEN` 为空时会
+> 跳过 npm 发布步骤，其余步骤照常执行；npm/市场后续补。
 
 ## 3. 手工发布（CI 不可用时）
 
@@ -61,7 +62,7 @@ npm pack
 - [ ] npm 页面显示正确版本、README、License。
 - [ ] `pnpm add paperdepot` 在干净 profile 能安装并出现「论文库」面板。
 - [ ] GitHub Release 附件可下载，tarball 安装可用。
-- [ ] `https://github.com/OWNER/paperdepot/issues/new/choose` 模板正常。
+- [ ] `https://github.com/HUAWEIYYLS/paperdepot/issues/new/choose` 模板正常。
 - [ ] 市场条目（如已收录）版本/截图/描述正确。
 
 ## 5. 插件市场上架 / 更新

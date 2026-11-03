@@ -39,7 +39,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 _CONTACT = (os.environ.get('PAPERDEPOT_CONTACT_EMAIL') or '').strip()
 UA = (f'PaperDepot/1.0 (mailto:{_CONTACT})' if _CONTACT
-      else 'PaperDepot/1.0 (+https://github.com/OWNER/paperdepot)')
+      else 'PaperDepot/1.0 (+https://github.com/HUAWEIYYLS/paperdepot)')
 TIMEOUT = 30
 
 # arXiv 官方要求：单连接、间隔 3 秒。裸调会被限流（实测 10 次里 4 次失败）

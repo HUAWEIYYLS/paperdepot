@@ -12,6 +12,8 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,10 +37,9 @@ jobs:
           node tests/check-paths.mjs
         env:
           PAPERDEPOT_PYTHON: python
-      - name: Publish to npm
+      - name: Publish to npm（未配置 NPM_TOKEN 时跳过）
+        if: ${{ env.NODE_AUTH_TOKEN != '' }}
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Pack release asset
         run: npm pack
       - name: Create GitHub Release

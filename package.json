@@ -36,11 +36,11 @@
   "author": "PaperDepot contributors",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OWNER/paperdepot.git"
+    "url": "git+https://github.com/HUAWEIYYLS/paperdepot.git"
   },
-  "homepage": "https://github.com/OWNER/paperdepot#readme",
+  "homepage": "https://github.com/HUAWEIYYLS/paperdepot#readme",
   "bugs": {
-    "url": "https://github.com/OWNER/paperdepot/issues"
+    "url": "https://github.com/HUAWEIYYLS/paperdepot/issues"
   },
   "dsh": {
     "bundle": {
