@@ -35,6 +35,15 @@ jobs:
           node tests/check-paths.mjs
         env:
           PAPERDEPOT_PYTHON: python
+      - name: Pack release asset
+        run: npm pack
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: paperdepot-*.tgz
+          generate_release_notes: true
+          fail_on_unmatched_files: false
+      # 放在 Release 之后：npm 发布失败（token 过期/被占版本）不会挡住 GitHub Release。
       - name: Publish to npm（未配置 NPM_TOKEN 时跳过）
         run: |
           if [ -z "${NODE_AUTH_TOKEN}" ]; then
@@ -44,11 +53,3 @@ jobs:
           npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Pack release asset
-        run: npm pack
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: paperdepot-*.tgz
-          generate_release_notes: true
-          fail_on_unmatched_files: false

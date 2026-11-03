@@ -9,9 +9,9 @@
 ## 极简版（三行，够用时）
 
 ```text
-把 DSH 插件「论文库」装到我的 profile：https://github.com/HUAWEIYYLS/paperdepot
-优先用 Release 的 paperdepot-*.tgz 执行 pnpm add；在 cordis.patch.yml 里加
-id: paperdepot / name: paperdepot；装 Python 依赖；完成后提醒我重启 DSH 并检查 /paperdepot/api/health。
+把 DSH 插件「论文库」装到我的 profile：pnpm add paperdepot（已发布 npm）；
+在 cordis.patch.yml 里加 id: paperdepot / name: paperdepot；装 Python 依赖
+（插件包 pipeline/requirements.txt）；完成后提醒我重启 DSH 并检查 /paperdepot/api/health。
 ```
 
 ---
@@ -28,11 +28,12 @@ https://github.com/HUAWEIYYLS/paperdepot
 按下面步骤做，每步先确认再执行，失败就停下并把原始报错发我：
 
 1. 定位 profile 目录：确认里面存在 package.json 和 cordis.patch.yml，并告诉我绝对路径。
-2. 安装插件，优先用 GitHub Release 的 tarball：
-   - 从 https://github.com/HUAWEIYYLS/paperdepot/releases/latest 找到 paperdepot-*.tgz 并下载到本地临时目录；
-   - 在 profile 目录执行：pnpm add "<该 tgz 的绝对路径>"
-   - 如果 tarball 下载失败，退回源码方式：git clone 仓库到本地（不要放进 Obsidian 库），
-     然后 pnpm add "link:<仓库绝对路径>"
+2. 安装插件，优先从 npm 装（已发布为 paperdepot）：
+   - 在 profile 目录执行：pnpm add paperdepot
+   - 如果 registry 连不上，退回 GitHub Release 的 tarball：
+     从 https://github.com/HUAWEIYYLS/paperdepot/releases/latest 下载 paperdepot-*.tgz，
+     再执行 pnpm add "<该 tgz 的绝对路径>"
+   - 再不行的兜底：git clone 仓库到本地（不要放进 Obsidian 库），pnpm add "link:<仓库绝对路径>"
 3. 在 profile 的 cordis.patch.yml 末尾追加下面两项；文件里已有 id: paperdepot 就跳过，不要重复加：
 
    - insert:
