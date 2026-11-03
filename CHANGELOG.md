@@ -7,12 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-03
+
 ### Added
 
 - `docs/install-prompt.md`：一键安装提示词与日常使用提示词，可整段交给 DSH 自动完成安装与配置；
   README / README.en 增加入口。
 - `market/index.json` + `scripts/build-market-index.mjs`：自建 DSH 插件市场索引（format 1），
   用户可在「发现」页添加索引源后搜索到并安装；README 增加「方式 E」。
+- 发布到 npm registry：`paperdepot@0.1.1` 起可用 `pnpm add paperdepot` 安装，
+  插件市场索引也切成 npm 源，安装不再需要下载 tarball。
+
+### Fixed
+
+- 从 Git 仓库地址直接安装时缺少 `pipeline/`（Python 流水线与受控词表）：新增 `prepare` 脚本在安装时生成。
 
 ## [0.1.0] - 2026-11-03
 

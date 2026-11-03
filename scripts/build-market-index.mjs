@@ -14,6 +14,10 @@ const commit = git(['rev-parse', 'HEAD'])
 const publishTimestamp = Number(git(['log', '-1', '--format=%ct']))
 const repoUrl = 'https://github.com/HUAWEIYYLS/paperdepot'
 
+// 默认按 Git 源（固定提交）写索引；npm 发布之后用 --npm 切成 npm 源，装的是 registry 上的预打包 tarball。
+const useNpm = process.argv.includes('--npm')
+const versionSource = useNpm ? { type: 'npm' } : { type: 'git', url: repoUrl, commit }
+
 if (!/^[0-9a-f]{40}$/.test(commit)) throw new Error(`HEAD 不是 40 位提交号：${commit}`)
 
 const index = {
@@ -59,7 +63,7 @@ const index = {
         {
           version: pkg.version,
           publishTimestamp,
-          source: { type: 'git', url: repoUrl, commit },
+          source: versionSource,
           engines: { dsh: pkg.engines.dsh },
         },
       ],
