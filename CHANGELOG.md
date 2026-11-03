@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- 批量补摘要：面板顶栏「批量补摘要（N）」把「待生成」条目排队跑完，底部进度条实时显示
+  完成/失败数，可随时「停止」；中断后再点会跳过已完成的继续（断点续跑）。
+  对应 host 新路由 `POST /paperdepot/api/summarize-pending`、`POST /paperdepot/api/job-cancel`。
+  历史遗留（开源前入库、当时无模型）的条目不再需要逐篇手动补。
+
 ## [0.1.1] - 2026-11-03
 
 ### Added

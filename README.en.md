@@ -12,7 +12,9 @@ It handles ingestion and organization; Obsidian only stores and reads.
 
 - Import PDFs by drag-and-drop, file picker, or local path (deduplicated by fingerprint).
 - Parse with MinerU, resolve metadata via Crossref / arXiv.
-- Generate a structured Chinese summary and four controlled tag categories with an LLM.
+- Generate a structured Chinese summary and four controlled tag categories with an LLM;
+  re-run per paper, or **backfill in batch** (queued, stoppable, and resumable — finished
+  entries are skipped on the next run).
 - Write Obsidian-native frontmatter, `index.md`, `full.md`, `paper.pdf`, and `images/`.
 - Browse overview / papers / concepts in the DSH sidebar panel.
 - Generate taxonomy pages and paper navigation blocks; export a read-only mobile edition.

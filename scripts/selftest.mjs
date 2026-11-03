@@ -184,6 +184,53 @@ if (anyEntry) {
   check('index.md 写入摘要', newIndex.includes('自检用的一句话总结'))
   check('index.md 写入分层标签', newIndex.includes('领域/天文仪器') && newIndex.includes('方法/光纤定位'))
 
+  // 批量补摘要：把条目打回「待生成」，一次排队跑完，验证进度与断点续跑的关键字段
+  const batchEntries = [pendingEntry]
+  const otherEntry = fs
+    .readdirSync(srcPapers, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && !d.name.startsWith('_') && d.name !== pendingEntry)
+    .map((d) => d.name)
+    .find((name) => fs.existsSync(path.join(srcPapers, name, 'full.md')))
+  if (otherEntry) {
+    fs.cpSync(path.join(srcPapers, otherEntry), path.join(tmpVault, '1-Papers', otherEntry), { recursive: true })
+    batchEntries.push(otherEntry)
+  } else {
+    // 库里只有一篇时复制一份，保证批量至少跑两篇（验证循环而不是只跑一篇）
+    const copyName = `${pendingEntry} 副本`
+    fs.cpSync(path.join(tmpVault, '1-Papers', pendingEntry), path.join(tmpVault, '1-Papers', copyName), { recursive: true })
+    batchEntries.push(copyName)
+  }
+  for (const name of batchEntries) {
+    const dir = path.join(tmpVault, '1-Papers', name)
+    const idx2 = fs.readFileSync(path.join(dir, 'index.md'), 'utf8')
+    const fm2 = /^---\s*\n[\s\S]*?\n---\s*\n/.exec(idx2)
+    fs.writeFileSync(path.join(dir, 'index.md'), (fm2 ? fm2[0] : '') + '\n## 一句话总结\n\n> 待生成\n\n## 研究背景\n\n待生成\n')
+  }
+  const batchAccepted = await call2('POST', '/paperdepot/api/summarize-pending')
+  check(
+    'POST /summarize-pending 受理',
+    batchAccepted.status === 202 && batchAccepted.json.total === batchEntries.length,
+    JSON.stringify(batchAccepted.json),
+  )
+  let batchJob = null
+  for (let i = 0; i < 300; i++) {
+    await new Promise((r) => setTimeout(r, 400))
+    const j = await call2('GET', '/paperdepot/api/job')
+    batchJob = j.json.job
+    if (batchJob && batchJob.state !== 'running') break
+  }
+  check(
+    '批量补摘要任务完成',
+    batchJob && batchJob.kind === 'summarize-batch' && batchJob.state === 'done' && batchJob.done === batchEntries.length,
+    batchJob ? `${batchJob.state} ${batchJob.done}/${batchJob.total} failed=${(batchJob.failed || []).length}` : 'no job',
+  )
+  check(
+    '批量补摘要写入全部条目',
+    batchEntries.every((n) => fs.readFileSync(path.join(tmpVault, '1-Papers', n, 'index.md'), 'utf8').includes('自检用的一句话总结')),
+  )
+  const noPending = await call2('POST', '/paperdepot/api/summarize-pending')
+  check('POST /summarize-pending 无待生成时拒绝', noPending.status === 400, noPending.json && noPending.json.error)
+
   // apply_summary 重建 index.md 时必须保留 make_nav 写入的导航块
   const entryDir = path.join(tmpVault, '1-Papers', pendingEntry)
   fs.copyFileSync(path.join(srcDir, 'index.md'), path.join(entryDir, 'index.md'))
@@ -250,6 +297,8 @@ check('client 含面板级拖拽/路径导入', clientSrc.includes('onDrop') && 
 check('client 含错误边界', clientSrc.includes('getDerivedStateFromError'))
 check('client 含 Obsidian 跳转（走宿主）', clientSrc.includes('/paperdepot/api/open-obsidian') && !clientSrc.includes("window.open('obsidian://"))
 check('host 含 open-obsidian 路由', implSrc.includes('/paperdepot/api/open-obsidian') && implSrc.includes('FileProtocolHandler'))
+check('client 含批量补摘要入口与进度条', clientSrc.includes('/summarize-pending') && clientSrc.includes('批量补摘要'))
+check('host 含批量补摘要 / 停止任务路由', implSrc.includes('/paperdepot/api/summarize-pending') && implSrc.includes('/paperdepot/api/job-cancel'))
 
 // SKILL 契约：配置文件存在、宿主读取它并跑校验器
 {
