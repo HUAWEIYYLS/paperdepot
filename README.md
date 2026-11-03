@@ -216,6 +216,8 @@ pnpm add "link:D:\path\to\paperdepot"
 - Bug / 功能请求：GitHub Issues。
 - 开发与提交规范：见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 - 安全问题：见 [SECURITY.md](SECURITY.md)，不要公开提 issue。
+- 维护者发布/分诊手册：见 [docs/maintainer/](docs/maintainer/)。
+- 行为准则：见 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)。
 - 提交代码即表示同意以 MIT 许可证贡献。
 
 ## 许可证

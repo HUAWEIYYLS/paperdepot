@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 使用问题 / 讨论
+    url: https://github.com/OWNER/paperdepot/discussions
+    about: 安装、配置、使用问题优先放 Discussions
+  - name: 安全漏洞
+    url: https://github.com/OWNER/paperdepot/security/advisories/new
+    about: 请走私密安全公告，不要公开提 issue

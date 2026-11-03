@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Verify tag matches package.json
+        run: |
+          node -e "const v=require('./package.json').version; const t=process.env.GITHUB_REF_NAME.replace(/^v/,''); if(v!==t){console.error('tag',t,'!= package',v);process.exit(1)}"
+      - name: Test
+        run: |
+          node scripts/selftest.mjs tests/fixture-vault
+          node tests/check-package.mjs
+          node tests/check-paths.mjs
+        env:
+          PAPERDEPOT_PYTHON: python
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Pack release asset
+        run: npm pack
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: paperdepot-*.tgz
+          generate_release_notes: true
+          fail_on_unmatched_files: false

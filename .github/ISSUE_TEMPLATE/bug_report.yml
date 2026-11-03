@@ -1,0 +1,72 @@
+name: Bug report
+description: 报告一个可复现的问题
+title: "[Bug] "
+labels: ["bug", "needs-repro"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请尽量提供可复现信息；日志里请先删掉 MinerU key。
+        安装/使用问题也可以先看 README 的常见问题。
+  - type: input
+    id: plugin-version
+    attributes:
+      label: 论文库版本
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: dsh-version
+    attributes:
+      label: DSH 版本
+      placeholder: "0.2.1-rc.x"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: 安装方式
+      options:
+        - GitHub Release tarball
+        - npm
+        - DSH 插件市场
+        - 源码 link
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: 操作系统 / Python
+      placeholder: "Windows 11 / Python 3.12"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望结果
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志 / 截图
+      description: 面板日志、DSH 控制台、报错截图；请先脱敏。
+      render: text
+    validations:
+      required: false

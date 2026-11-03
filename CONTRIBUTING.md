@@ -31,7 +31,7 @@ python -m pip install -r requirements-dev.txt
 | `tests/fixture-vault/` | 合成测试库，不包含真实论文 |
 | `scripts/` | `selftest.mjs`、`pack-pipeline.mjs` |
 | `.github/workflows/` | CI |
-| `docs/` | 用户/维护者文档（P1 补齐） |
+| `docs/` | 用户/维护者文档（`docs/maintainer/` 已有发布与分诊手册） |
 
 ## 跑测试
 
@@ -75,8 +75,9 @@ CI 在 Windows + Ubuntu 上跑同样三项，并跑 gitleaks。
 
 ## 文档
 
-- 面向用户：`README.md`、`docs/`（P1）。
-- 面向维护者：`docs/maintainer/`（P1）。
+- 面向用户：`README.md`、`docs/`。
+- 面向维护者：`docs/maintainer/release.md`、`docs/maintainer/triage.md`。
+- 行为准则：`CODE_OF_CONDUCT.md`。
 - 不要把内部实验报告、个人库统计、真实论文标题/摘要放进公开仓库。
 
 ## 许可
