@@ -81,11 +81,11 @@ DSH 目前**没有官方插件市场**：开箱的「发现」页默认没有任
 
 ### 方式 C：GitHub Release tarball（国内网络更稳）
 
-从 Releases 下载 `paperdepot-<版本>.tgz`（如 `paperdepot-0.1.1.tgz`），然后：
+从 Releases 下载 `paperdepot-<版本>.tgz`（如 `paperdepot-0.1.2.tgz`），然后：
 
 ```powershell
 cd "$env:USERPROFILE\.dsh\profiles\desktop"
-pnpm add "D:\downloads\paperdepot-0.1.1.tgz"
+pnpm add "D:\downloads\paperdepot-0.1.2.tgz"
 ```
 
 也可以把 tgz 的绝对路径填进 DSH「添加插件」对话框的输入框。

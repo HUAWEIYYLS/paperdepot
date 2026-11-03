@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-03
+
 ### Added
 
 - 批量补摘要：面板顶栏「批量补摘要（N）」把「待生成」条目排队跑完，底部进度条实时显示
