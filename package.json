@@ -1,0 +1,82 @@
+{
+  "name": "paperdepot",
+  "version": "0.1.0",
+  "description": "论文库（PaperDepot）— 把 PDF 论文变成可检索、可读、可连接的 Obsidian 知识库。DeepSeek Harness 插件。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./host": "./lib/host.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "pipeline",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "requirements.txt"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "obsidian",
+    "literature",
+    "paper",
+    "pdf",
+    "mineru",
+    "knowledge-base",
+    "academic-research",
+    "paper-library"
+  ],
+  "license": "MIT",
+  "author": "PaperDepot contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OWNER/paperdepot.git"
+  },
+  "homepage": "https://github.com/OWNER/paperdepot#readme",
+  "bugs": {
+    "url": "https://github.com/OWNER/paperdepot/issues"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ],
+      "platform": "web"
+    }
+  },
+  "engines": {
+    "node": ">=20",
+    "dsh": ">=0.2.1-rc.1 <0.3.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.5",
+    "react": "^18.3.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "selftest": "node scripts/selftest.mjs tests/fixture-vault",
+    "test": "node scripts/selftest.mjs tests/fixture-vault",
+    "test:python": "python -m pytest -q",
+    "check:package": "node tests/check-package.mjs",
+    "check:paths": "node tests/check-paths.mjs",
+    "pack:pipeline": "node scripts/pack-pipeline.mjs",
+    "prepack": "node scripts/pack-pipeline.mjs"
+  }
+}

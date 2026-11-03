@@ -1,0 +1,13 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "测试 fixture 中的假 key / 示例占位符"
+paths = [
+  '''tests/fixture-vault/.*''',
+  '''config/secrets.example.json''',
+]
+regexes = [
+  '''sk-test[0-9A-Za-z]*''',
+  '''sk-xxxxxxxx[0-9A-Za-z]*''',
+]

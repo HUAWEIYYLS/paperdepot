@@ -1,0 +1,31 @@
+# 运行产物：可重建，体积大
+cache/
+pipeline/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+tests/tmp/
+
+# npm / Node
+node_modules/
+*.tgz
+
+# 本地配置与密钥（绝不进 git）
+config/*.local.json
+config/secrets.local.json
+
+# 私有存档/隔离区（公开仓库外）
+_private/
+archive/
+docs/internal/
+
+# 系统与临时文件
+Thumbs.db
+desktop.ini
+.DS_Store
+*.tmp
+*.log
+~$*
