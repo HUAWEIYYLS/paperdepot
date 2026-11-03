@@ -14,6 +14,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   对应 host 新路由 `POST /paperdepot/api/summarize-pending`、`POST /paperdepot/api/job-cancel`。
   历史遗留（开源前入库、当时无模型）的条目不再需要逐篇手动补。
 
+### Changed
+
+- 论文 / 概念详情页改为阅读版式渲染：不再把 `index.md` 原始文本整段塞进 `<pre>`，
+  而是去掉 frontmatter、导航块与重复的基础信息表，把标题、列表、表格、引用、行内公式
+  与 wikilink 按论文排版显示；左栏列表重做为年份列 + 两行标题 + 待补标记，
+  概念页增加引用数、别名、标签与相关论文列表。
+- 统一分类语义色：`领域 / 方法 / 应用 / 仪器` 四类固定色 + 概念页独立色，用于论文与概念页的
+  chip、列表里的领域识别点、总览的标签分布条形图与概念计数；正文里的概念 / 分类双链也按
+  对应颜色显示。
+
+### Fixed
+
+- 面板底部增加固定安全区（等价 ArkUI 的 `Blank()`/bottom safe area）：在根 flex 容器末尾放一个
+  不随内容滚动的占位块，把上方内容整体顶上去；同时修正总览页滚动容器缺 `box-sizing: border-box`
+  导致 `padding-bottom` 被算到 100% 高度之外、跑到窗口下面的问题。滚动区底部留白同步收敛为
+  72px（阅读区 / 总览）与 32px（列表），批量补摘要进度条距底 24px。
+
 ## [0.1.1] - 2026-11-03
 
 ### Added

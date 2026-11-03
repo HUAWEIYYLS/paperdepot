@@ -16,7 +16,8 @@ It handles ingestion and organization; Obsidian only stores and reads.
   re-run per paper, or **backfill in batch** (queued, stoppable, and resumable — finished
   entries are skipped on the next run).
 - Write Obsidian-native frontmatter, `index.md`, `full.md`, `paper.pdf`, and `images/`.
-- Browse overview / papers / concepts in the DSH sidebar panel.
+- Browse overview / papers / concepts in the DSH sidebar panel, with a typeset reader
+  (headings, lists, tables, inline math and wikilinks instead of raw Markdown).
 - Generate taxonomy pages and paper navigation blocks; export a read-only mobile edition.
 
 ## Requirements

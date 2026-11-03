@@ -299,6 +299,10 @@ check('client 含 Obsidian 跳转（走宿主）', clientSrc.includes('/paperdep
 check('host 含 open-obsidian 路由', implSrc.includes('/paperdepot/api/open-obsidian') && implSrc.includes('FileProtocolHandler'))
 check('client 含批量补摘要入口与进度条', clientSrc.includes('/summarize-pending') && clientSrc.includes('批量补摘要'))
 check('host 含批量补摘要 / 停止任务路由', implSrc.includes('/paperdepot/api/summarize-pending') && implSrc.includes('/paperdepot/api/job-cancel'))
+check(
+  'client 论文/概念详情走 Markdown 排版',
+  clientSrc.includes('function Markdown') && clientSrc.includes('parsePaperFrontmatter') && clientSrc.includes('mdTable') && clientSrc.includes('stripEntryChrome'),
+)
 
 // SKILL 契约：配置文件存在、宿主读取它并跑校验器
 {
