@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-05
+
 ### Fixed
 
 - **安装态 MinerU key 读不到（面板显示「已配置」，导入却报「未配置 MinerU key」）**：
