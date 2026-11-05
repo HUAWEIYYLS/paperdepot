@@ -8,6 +8,7 @@
 - [ ] `node scripts/selftest.mjs tests/fixture-vault` 通过。
 - [ ] `node tests/check-package.mjs` 通过（无 `*.local.json` / 个人清单 / 缓存）。
 - [ ] `node tests/check-paths.mjs` 通过（无个人路径 / 旧品牌 / 疑似 key）。
+- [ ] `python -m pytest -q tests` 通过（含安装态 `pipeline/tools` 的 key 路径回归）。
 - [ ] CI 在 Windows + Ubuntu 全绿；gitleaks 通过。
 - [ ] 已轮换/确认 MinerU key：仓库历史、环境变量、日志里无真实 key。
 - [ ] `README.md` 的安装步骤、截图、版本号与当前行为一致。

@@ -40,6 +40,8 @@ It handles ingestion and organization; Obsidian only stores and reads.
    Hand the [one-prompt installer](https://github.com/HUAWEIYYLS/paperdepot/blob/main/docs/install-prompt.md) to DSH.
 3. Get a MinerU token at <https://mineru.net>.
 4. Open the **论文库** panel in DSH, paste the token, verify it, and choose your vault.
+   The token is stored in `~/.dsh/paperdepot/config/` and passed to the Python pipeline
+   (`MINERU_API_KEY` / `PAPERDEPOT_*`), so the panel and the pipeline read the same file.
 5. Drop a PDF into the panel and open the generated entry in Obsidian.
 
 Full instructions (in Chinese): [README.md](README.md).

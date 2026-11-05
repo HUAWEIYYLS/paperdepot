@@ -101,11 +101,38 @@ const byBadPath = await call('POST', '/paperdepot/api/import-path', Buffer.from(
 check('POST /import-path 拒绝不存在路径', byBadPath.status === 404, byBadPath.json && byBadPath.json.error)
 
 // ---------- 首次配置（onboarding） ----------
+// 安装态回归：宿主写文件 key，Python 子进程必须读到同一份（不联网、不打印 key）
+const fakeMineruKey = 'sk-' + 'selftest' + '0123456789ab'
+fs.writeFileSync(path.join(cfgRoot, 'secrets.json'), JSON.stringify({ mineru_api_key: fakeMineruKey }))
 const setup = await call('GET', '/paperdepot/api/setup/status')
 check(
   'GET /setup/status',
   setup.status === 200 && setup.json.ok === true && typeof setup.json.hasKey === 'boolean' && !!setup.json.python,
   `hasKey=${setup.json.hasKey} python=${setup.json.python && setup.json.python.version}`,
+)
+check('GET /setup/status 识别文件里的 key', setup.json.hasKey === true, `keySource=${setup.json.keySource}`)
+if (setup.json.python && setup.json.python.ok) {
+  check(
+    'Python 流水线读到同一份 key（宿主/子进程路径一致）',
+    setup.json.pythonKey && setup.json.pythonKey.ok === true,
+    JSON.stringify(setup.json.pythonKey),
+  )
+}
+const childEnv = impl.buildChildEnv({
+  homeRoot: path.join(cfgRoot, 'home'),
+  configDir: path.join(cfgRoot, 'home', 'config'),
+  secretsPath: path.join(cfgRoot, 'secrets.json'),
+  vault,
+})
+check(
+  'buildChildEnv 传递 PAPERDEPOT_HOME / PAPERDEPOT_CONFIG_DIR',
+  childEnv.PAPERDEPOT_HOME === path.join(cfgRoot, 'home') &&
+    childEnv.PAPERDEPOT_CONFIG_DIR === path.join(cfgRoot, 'home', 'config') &&
+    childEnv.PAPERDEPOT_VAULT === vault,
+)
+check(
+  'buildChildEnv 传递 MINERU_API_KEY',
+  childEnv.MINERU_API_KEY === (process.env.MINERU_API_KEY || fakeMineruKey),
 )
 const badKey = await call('POST', '/paperdepot/api/setup/key', Buffer.from('{"key":"abc"}'))
 check('POST /setup/key 拒绝坏格式', badKey.status === 400, badKey.json && badKey.json.error)

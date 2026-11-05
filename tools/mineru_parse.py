@@ -41,22 +41,81 @@ if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 # ── 配置 ──────────────────────────────────────────────────────────────
-def _load_api_key() -> str:
-    """按优先级取 MinerU key：环境变量 → config/secrets.local.json（不进 git）。"""
-    key = (os.environ.get('MINERU_API_KEY') or '').strip()
-    if key:
-        return key
-    import json as _json
-    p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                     'config', 'secrets.local.json')
+def _candidate_key_files() -> list:
+    """按优先级列出 secrets.local.json 候选路径（去重、保持顺序）。
+
+    宿主 lib/impl.js 把 key 写在 <homeRoot>/config/（安装态是
+    ~/.dsh/paperdepot/config/），并在启动流水线时通过 PAPERDEPOT_HOME /
+    PAPERDEPOT_CONFIG_DIR / MINERU_API_KEY 传给子进程。这里再做一层兜底，
+    让直接跑脚本（未经过宿主）时也能找到同一份 key；插件包内旧路径仅为兼容。
+    """
+    seen = set()
+    cands = []
+
+    def add(p):
+        if not p:
+            return
+        p = os.path.abspath(os.path.expanduser(p))
+        mark = os.path.normcase(p)
+        if mark not in seen:
+            seen.add(mark)
+            cands.append(p)
+
+    cfg = (os.environ.get('PAPERDEPOT_CONFIG_DIR') or '').strip()
+    if cfg:
+        add(os.path.join(cfg, 'secrets.local.json'))
+    home = (os.environ.get('PAPERDEPOT_HOME') or '').strip()
+    if home:
+        add(os.path.join(home, 'config', 'secrets.local.json'))
     try:
-        with io.open(p, encoding='utf-8') as f:
-            return (_json.load(f).get('mineru_api_key') or '').strip()
+        import _paths
+        add(_paths.secrets_path())
+    except Exception:
+        pass
+    # 旧版路径：<仓库或插件包的上一级>/config（安装态即 <插件包>/pipeline/config）
+    add(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                     'config', 'secrets.local.json'))
+    # 不依赖 _paths 导入成功的最终兜底（与宿主安装态默认值一致）
+    add(os.path.join('~', '.dsh', 'paperdepot', 'config', 'secrets.local.json'))
+    return cands
+
+
+def _read_key_file(path: str) -> str:
+    try:
+        with io.open(path, encoding='utf-8') as f:
+            return (json.load(f).get('mineru_api_key') or '').strip()
     except Exception:
         return ''
 
 
-API_KEY = _load_api_key()
+def _resolve_api_key():
+    """返回 (key, 来源)：环境变量 → 用户配置 → 旧插件包路径。"""
+    key = (os.environ.get('MINERU_API_KEY') or '').strip()
+    if key:
+        return key, 'env:MINERU_API_KEY'
+    for p in _candidate_key_files():
+        k = _read_key_file(p)
+        if k:
+            return k, p
+    return '', ''
+
+
+API_KEY, KEY_SOURCE = _resolve_api_key()
+
+
+def _load_api_key() -> str:
+    """兼容旧调用：只返回当前解析到的 key。"""
+    return API_KEY
+
+
+def _key_hint() -> str:
+    """没配 key 时把查过的路径列出来，方便用户/支持定位（不含 key 本身）。"""
+    return ('未配置 MinerU key。已检查环境变量 MINERU_API_KEY 和：\n  '
+            + '\n  '.join(_candidate_key_files())
+            + '\n请在「论文库」面板里填 Token（保存后宿主会把它传给流水线），'
+              '或设置环境变量 MINERU_API_KEY。')
+
+
 BASE = 'https://mineru.net/api/v4'
 
 # 已知 CDN 证书过期，只替换这一个 host
@@ -113,7 +172,7 @@ def pdf_fingerprint(path: str) -> str:
 
 def api_call(path: str, method: str = 'GET', payload=None, timeout: int = 120) -> dict:
     if not API_KEY:
-        raise MineruError('未配置 MinerU key：请设置环境变量 MINERU_API_KEY，或写 config/secrets.local.json（模板见 config/secrets.example.json）')
+        raise MineruError(_key_hint())
     url = f'{BASE}{path}'
     headers = {'Authorization': f'Bearer {API_KEY}', 'Accept': '*/*'}
     body = None
@@ -235,6 +294,19 @@ def config_glob(suffix: str) -> str:
 def cache_compatible(cached: dict) -> bool:
     """旧缓存没有 cache_version，按 1 处理（路径已在命中时改写，兼容搬家）。"""
     return cached.get('cache_version', 1) == CACHE_VERSION
+
+
+def _selftest_key() -> int:
+    """离线自检：只确认 key 能否解析到、来源在哪，不联网、不打印 key。"""
+    if API_KEY:
+        print(f'MinerU key: 已找到（来源：{KEY_SOURCE}）')
+        print('key ok = True')
+        return 0
+    print('MinerU key: 未找到，已检查：')
+    for p in _candidate_key_files():
+        print('  - ' + p)
+    print('key ok = False')
+    return 1
 
 
 def _cache_selftest() -> int:
@@ -425,10 +497,13 @@ def main():
     ap.add_argument('--keep-zip', action='store_true', help='保留原始 ZIP')
     ap.add_argument('--json', action='store_true', help='只输出 JSON 摘要')
     ap.add_argument('--selftest-cache', action='store_true', help='离线自检缓存迁移逻辑（不耗 API）')
+    ap.add_argument('--selftest-key', action='store_true', help='离线自检 MinerU key 解析位置（不耗 API）')
     args = ap.parse_args()
 
     if args.selftest_cache:
         return _cache_selftest()
+    if args.selftest_key:
+        return _selftest_key()
     if not args.pdf:
         ap.error('缺少 PDF 路径')
 

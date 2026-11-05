@@ -111,6 +111,8 @@ pnpm add "link:D:\path\to\paperdepot"
 
 1. **MinerU Token**：粘贴 → 「保存并验证」。插件会真的调一次 MinerU 接口验 key。
    Token 只写到本机配置文件，不会上传；也可以用环境变量 `MINERU_API_KEY`。
+   安装态文件在 `~/.dsh/paperdepot/config/secrets.local.json`，插件启动 Python 流水线时
+   会把同一份 key 与配置目录传进去（面板会显示「Python 流水线能读到同一个 key」）。
 2. **Obsidian 库路径**：选择一个已存在的文件夹；空库也可以，第一次导入会创建 `1-Papers/`。
 3. **Python 依赖**：需要 Python 3.10+ 和以下依赖：
 
@@ -171,6 +173,8 @@ pnpm add "link:D:\path\to\paperdepot"
 
 - `MINERU_API_KEY`：MinerU Token（优先于本地文件）。
 - `PAPERDEPOT_HOME`：安装态数据根。
+- `PAPERDEPOT_CONFIG_DIR`：配置目录覆盖（默认 `<PAPERDEPOT_HOME>/config`）。安装态由插件在启动 Python 时自动注入；
+  手动跑 `pipeline/tools/` 下的脚本时才需要自己设置。
 - `PAPERDEPOT_VAULT`：默认库路径。
 - `PAPERDEPOT_PYTHON`：Python 解释器。
 - `ZOTERO_STORAGE`：Zotero storage 目录（仅 `--from-storage` 用）。
@@ -186,6 +190,12 @@ pnpm add "link:D:\path\to\paperdepot"
 **MinerU 报 401 / 403 / 429**
 - 401/403：Token 无效或过期，重新申请并保存。
 - 429：免费额度或频率限制，等一会儿或换自己的额度。
+
+**面板显示「MinerU 已配置」，导入却报「未配置 MinerU key」**
+- 0.1.2 及更早的安装态已知问题：面板（Node）把 key 写到 `~/.dsh/paperdepot/config/`，
+  Python 流水线却去插件包的 `pipeline/config/` 找，两边路径不一致。
+- 升级到含本修复的版本即可；临时绕过：给 DSH 进程设置环境变量 `MINERU_API_KEY` 后重启。
+- 新版本配置卡会显示「Python 流水线能读到同一个 key」；如果显示读不到，按上面两条处理。
 
 **导入成功但没有摘要**
 - 没有配置可用模型，或模型调用失败。入库不受影响；之后在论文页补摘要即可。

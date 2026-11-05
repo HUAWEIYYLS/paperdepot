@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **安装态 MinerU key 读不到（面板显示「已配置」，导入却报「未配置 MinerU key」）**：
+  宿主把 key 写在 `~/.dsh/paperdepot/config/secrets.local.json`，而 Python 流水线
+  （`pipeline/tools/mineru_parse.py`）只去插件包内 `config/` 找，两边各读各的路径。
+  现在宿主启动 Python 子进程时会把 `PAPERDEPOT_HOME` / `PAPERDEPOT_CONFIG_DIR` /
+  `MINERU_API_KEY` 一并传下去；`tools/_paths.py` 也会识别 `<插件包>/pipeline/tools`
+  安装布局，把用户配置目录统一到 `~/.dsh/paperdepot/config/`；`mineru_parse.py`
+  按「环境变量 → `PAPERDEPOT_CONFIG_DIR` → `PAPERDEPOT_HOME` → 用户配置目录 →
+  旧插件包路径」依次查找。面板配置卡新增「Python 流水线能否读到同一个 key」自检，
+  直接暴露这类不一致。
+- 安装态直接运行 `python pipeline/tools/ingest.py`（不带 `--vault`）时，
+  `_paths.default_vault()` 之前读的是插件包内 `config/`，现在读用户配置目录，
+  能找到面板里设置的 Obsidian 库。
+
 ## [0.1.2] - 2026-11-03
 
 ### Added

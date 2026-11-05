@@ -46,7 +46,7 @@ https://github.com/HUAWEIYYLS/paperdepot
    （tarball/npm 安装时插件包在 profile 的 node_modules\paperdepot；link 安装时换成仓库根目录的 requirements.txt）
 5. 以上完成后告诉我「请重启 DSH」。我重启后，你再用当前 DSH 的 Web GUI 地址检查：
    - GET <DSH地址>/paperdepot/api/health 应返回 ok:true、pluginVersion 有值
-   - GET <DSH地址>/paperdepot/api/setup/status 看 hasKey、vaultReady 是否正常
+   - GET <DSH地址>/paperdepot/api/setup/status 看 hasKey、pythonKey.ok、vaultReady 是否正常
 6. 引导我做第一次配置：打开左侧栏「论文库」→ 配置卡 → 粘贴 MinerU Token →「保存并验证」→
    选择 Obsidian 库路径。然后让我拖一个 PDF 进去试导一篇。
 
@@ -86,4 +86,5 @@ https://github.com/HUAWEIYYLS/paperdepot
 | 左侧栏没有「论文库」 | profile 的 `cordis.patch.yml` 里 `name:` 是否是裸包名 `paperdepot`；`node_modules\paperdepot` 是否存在；然后重启 DSH |
 | health 通了但面板不在 | 同上，基本就是 `name` 写错 |
 | 导入报 Python 相关错误 | `python --version` 是否 >= 3.10；`pip install -r requirements.txt` 是否装到了同一个解释器 |
+| 面板显示 MinerU 已配置，导入却报未配置 key | 0.1.2 及更早安装态的已知路径 bug；升级到含修复版本，或给 DSH 进程设 `MINERU_API_KEY` 后重启。`setup/status` 的 `pythonKey.ok` 可直接看 Python 侧是否读到 |
 | MinerU 401/403 | Token 失效或贴错，重新保存并验证 |
