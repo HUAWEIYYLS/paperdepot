@@ -36,7 +36,7 @@ git push origin vX.Y.Z
 
 1. 校验 tag 与 `package.json` 版本一致。
 2. 跑 selftest / package check / paths check。
-3. `npm pack` 并把 `paperdepot-X.Y.Z.tgz` 作为 GitHub Release 附件（用 GitHub 自动生成的 release notes）。
+3. `npm pack` 并把 `dsh-paperdepot-X.Y.Z.tgz` 作为 GitHub Release 附件（用 GitHub 自动生成的 release notes）。
 4. `npm publish --access public --provenance`（使用仓库 secret `NPM_TOKEN`；未配置则跳过）。
    npm 步骤在 Release 之后：发布失败不会挡住 GitHub Release。
 
@@ -68,17 +68,17 @@ npm publish --access public
 npm pack
 ```
 
-把生成的 `paperdepot-X.Y.Z.tgz` 上传到 GitHub Release，并在 Release 说明里写：
+把生成的 `dsh-paperdepot-X.Y.Z.tgz` 上传到 GitHub Release，并在 Release 说明里写：
 
 - 本版功能 / 修复。
 - 安装方式（tarball / npm）。
-- 已知限制 / 升级注意。
+- 已知限制 / 升级注意（包名变更时给出一条迁移命令）。
 - 隐私提示（PDF 会传 MinerU）。
 
 ## 4. 发布后验证
 
 - [ ] npm 页面显示正确版本、README、License。
-- [ ] `pnpm add paperdepot` 在干净 profile 能安装并出现「论文库」面板。
+- [ ] `pnpm add dsh-paperdepot` 在干净 profile 能安装并出现「论文库」面板。
 - [ ] GitHub Release 附件可下载，tarball 安装可用。
 - [ ] `https://github.com/HUAWEIYYLS/paperdepot/issues/new/choose` 模板正常。
 - [ ] 市场条目（如已收录）版本/截图/描述正确。
@@ -90,9 +90,11 @@ npm pack
 
 ## 6. 回滚
 
-- npm：`npm deprecate paperdepot@X.Y.Z "reason"`；必要时 `npm unpublish`（谨慎，遵守 npm 规则）。
+- npm：`npm deprecate dsh-paperdepot@X.Y.Z "reason"`；必要时 `npm unpublish`（谨慎，遵守 npm 规则）。
 - GitHub：编辑/删除 Release 与 tag；发布一个修复版。
-- 配置/数据：保留旧版本包；用户可回退 `pnpm add paperdepot@old`。
+- 配置/数据：保留旧版本包；用户可回退 `pnpm add dsh-paperdepot@old`。
+- 旧包 `paperdepot`（0.1.x）：改名为 `dsh-paperdepot` 后已弃用，只保留 `npm deprecate paperdepot@0.1.3 "..."`
+  提示，不再发新版本。
 
 ## 7. 密钥轮换
 

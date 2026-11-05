@@ -286,7 +286,7 @@ const clientSrc = fs.readFileSync(path.join(root, 'lib/client.js'), 'utf8')
 const implSrc = fs.readFileSync(path.join(root, 'lib/impl.js'), 'utf8')
 let loaded = null
 vm.runInNewContext(clientSrc, { window: { __ModuleLoader__: { load: (def) => (loaded = def) } }, console }, { filename: 'client.js' })
-check('client 使用 __ModuleLoader__.load', loaded && loaded.id === 'paperdepot')
+check('client 使用 __ModuleLoader__.load', loaded && loaded.id === 'dsh-paperdepot')
 
 let registered = []
 const mod = loaded.factory((id) => {

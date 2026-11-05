@@ -33,7 +33,7 @@ PDF
 ## 5 分钟快速开始
 
 1. **准备 DSH + Obsidian**：安装 DSH 桌面版，并在 Obsidian 里新建或打开一个库（路径尽量短）。
-2. **安装插件**：任选下面一种方式（已发布到 npm，推荐 `pnpm add paperdepot`；也可用 tarball 或
+2. **安装插件**：任选下面一种方式（已发布到 npm，推荐 `pnpm add dsh-paperdepot`；也可用 tarball 或
    DSH 的「添加插件」对话框）；
    不想手动敲命令，就把[一键安装提示词](https://github.com/HUAWEIYYLS/paperdepot/blob/main/docs/install-prompt.md)整段发给 DSH。
 3. **申请 MinerU Token**：打开 <https://mineru.net> 注册 → 控制台 → API 管理 → 创建 Token。
@@ -48,21 +48,32 @@ PDF
 > 完全不想手动操作？把[一键安装提示词](https://github.com/HUAWEIYYLS/paperdepot/blob/main/docs/install-prompt.md)
 > 复制给 DSH，它会自己定位 profile、装包、写 `cordis.patch.yml`、装 Python 依赖并做安装后验证。
 
+> **0.2.0 起包名从 `paperdepot` 改为 `dsh-paperdepot`**，功能、API 路由、数据目录都不变。
+> 老用户升级（数据不迁移）：
+>
+> ```powershell
+> cd "$env:USERPROFILE\.dsh\profiles\desktop"
+> pnpm remove paperdepot
+> pnpm add dsh-paperdepot@0.2.0
+> ```
+>
+> 再把 `cordis.patch.yml` 里的 `name: paperdepot` 改成 `name: dsh-paperdepot`（`id: paperdepot` 可保留），重启 DSH。
+
 ### 方式 A：npm 安装（推荐）
 
 ```powershell
 cd "$env:USERPROFILE\.dsh\profiles\desktop"
-pnpm add paperdepot
+pnpm add dsh-paperdepot
 ```
 
-也可以在 DSH「插件 → 添加插件」对话框里直接填包名 `paperdepot`，它会自动装进 profile。
+也可以在 DSH「插件 → 添加插件」对话框里直接填包名 `dsh-paperdepot`，它会自动装进 profile。
 
 然后在 profile 的 `cordis.patch.yml` 末尾加上：
 
 ```yaml
 - insert:
     - id: paperdepot
-      name: paperdepot
+      name: dsh-paperdepot
       config:
         vault: 'C:\Users\<你>\Documents\ObsidianVault'
 ```
@@ -77,20 +88,20 @@ DSH 目前**没有官方插件市场**：开箱的「发现」页默认没有任
 1. DSH 侧栏 → **插件** → **实验性插件**旁的**更多** → 启用**自定义插件市场**；
 2. 插件页 → **发现** → **添加索引源** → 粘贴：
    `https://raw.githubusercontent.com/HUAWEIYYLS/paperdepot/main/market/index.json`
-3. 搜索「论文库」或 `paperdepot` → 安装。
+3. 搜索「论文库」或 `dsh-paperdepot` → 安装。
 
 ### 方式 C：GitHub Release tarball（国内网络更稳）
 
-从 Releases 下载 `paperdepot-<版本>.tgz`（如 `paperdepot-0.1.2.tgz`），然后：
+从 Releases 下载 `dsh-paperdepot-<版本>.tgz`（如 `dsh-paperdepot-0.2.0.tgz`），然后：
 
 ```powershell
 cd "$env:USERPROFILE\.dsh\profiles\desktop"
-pnpm add "D:\downloads\paperdepot-0.1.2.tgz"
+pnpm add "D:\downloads\dsh-paperdepot-0.2.0.tgz"
 ```
 
 也可以把 tgz 的绝对路径填进 DSH「添加插件」对话框的输入框。
 
-同样在 `cordis.patch.yml` 里加 `id: paperdepot / name: paperdepot` 的 insert。
+同样在 `cordis.patch.yml` 里加 `id: paperdepot / name: dsh-paperdepot` 的 insert。
 
 ### 方式 D：源码 link（开发 / 调试）
 
@@ -102,7 +113,7 @@ pnpm add "link:D:\path\to\paperdepot"
 
 `cordis.patch.yml` 同上。
 
-> **重要**：profile 里的 `name:` 必须是包名 `paperdepot`，不能写 `paperdepot/host`。
+> **重要**：profile 里的 `name:` 必须是包名 `dsh-paperdepot`，不能写 `dsh-paperdepot/host`。
 > 写子路径会出现「host 正常、左侧栏没有论文库」。
 
 ## 首次配置
@@ -182,8 +193,8 @@ pnpm add "link:D:\path\to\paperdepot"
 ## 常见问题
 
 **左侧栏没有「论文库」**
-1. 检查 profile 的 `cordis.patch.yml`：`name:` 必须是 `paperdepot`，不能是子路径。
-2. 检查 profile 的 `node_modules/paperdepot` 是否存在（link 或 npm 安装）。
+1. 检查 profile 的 `cordis.patch.yml`：`name:` 必须是 `dsh-paperdepot`，不能是子路径。
+2. 检查 profile 的 `node_modules/dsh-paperdepot` 是否存在（link 或 npm 安装）。
 3. 刷新页面；仍不行就重启 DSH。
 4. `GET /paperdepot/api/health` 能通但面板不在，基本就是第 1 条。
 
@@ -207,7 +218,7 @@ pnpm add "link:D:\path\to\paperdepot"
 - Windows 上库根目录尽量短；长路径问题优先把库放到浅目录。
 
 **怎么卸载**
-1. DSH 设置 → 插件 → 卸载；或从 profile 里移除 `paperdepot` 并删除 `cordis.patch.yml` 对应行。
+1. DSH 设置 → 插件 → 卸载；或从 profile 里移除 `dsh-paperdepot` 并删除 `cordis.patch.yml` 对应行。
 2. 删除 `~/.dsh/paperdepot/`（配置 + 缓存）。
 3. Obsidian 库里的 `1-Papers/` 等是你自己的数据，按需保留或移走。
 4. MinerU Token 可在 mineru.net 控制台删除。

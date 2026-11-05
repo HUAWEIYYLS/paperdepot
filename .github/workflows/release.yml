@@ -40,7 +40,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: paperdepot-*.tgz
+          files: dsh-paperdepot-*.tgz
           generate_release_notes: true
           fail_on_unmatched_files: false
       # 放在 Release 之后：npm 发布失败（token 过期/被占版本）不会挡住 GitHub Release。

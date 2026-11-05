@@ -9,8 +9,8 @@
 ## 极简版（三行，够用时）
 
 ```text
-把 DSH 插件「论文库」装到我的 profile：pnpm add paperdepot（已发布 npm）；
-在 cordis.patch.yml 里加 id: paperdepot / name: paperdepot；装 Python 依赖
+把 DSH 插件「论文库」装到我的 profile：pnpm add dsh-paperdepot（已发布 npm）；
+在 cordis.patch.yml 里加 id: paperdepot / name: dsh-paperdepot；装 Python 依赖
 （插件包 pipeline/requirements.txt）；完成后提醒我重启 DSH 并检查 /paperdepot/api/health。
 ```
 
@@ -28,22 +28,22 @@ https://github.com/HUAWEIYYLS/paperdepot
 按下面步骤做，每步先确认再执行，失败就停下并把原始报错发我：
 
 1. 定位 profile 目录：确认里面存在 package.json 和 cordis.patch.yml，并告诉我绝对路径。
-2. 安装插件，优先从 npm 装（已发布为 paperdepot）：
-   - 在 profile 目录执行：pnpm add paperdepot
+2. 安装插件，优先从 npm 装（已发布为 dsh-paperdepot）：
+   - 在 profile 目录执行：pnpm add dsh-paperdepot
    - 如果 registry 连不上，退回 GitHub Release 的 tarball：
-     从 https://github.com/HUAWEIYYLS/paperdepot/releases/latest 下载 paperdepot-*.tgz，
+     从 https://github.com/HUAWEIYYLS/paperdepot/releases/latest 下载 dsh-paperdepot-*.tgz，
      再执行 pnpm add "<该 tgz 的绝对路径>"
    - 再不行的兜底：git clone 仓库到本地（不要放进 Obsidian 库），pnpm add "link:<仓库绝对路径>"
 3. 在 profile 的 cordis.patch.yml 末尾追加下面两项；文件里已有 id: paperdepot 就跳过，不要重复加：
 
    - insert:
        - id: paperdepot
-         name: paperdepot
+         name: dsh-paperdepot
 
-   注意 name 必须是裸包名 paperdepot，不能写成 paperdepot/host 之类的子路径。
+   注意 name 必须是裸包名 dsh-paperdepot，不能写成 dsh-paperdepot/host 之类的子路径。
 4. 检查 Python：要求 >= 3.10；然后安装依赖：
    python -m pip install -r <插件包>/pipeline/requirements.txt
-   （tarball/npm 安装时插件包在 profile 的 node_modules\paperdepot；link 安装时换成仓库根目录的 requirements.txt）
+   （tarball/npm 安装时插件包在 profile 的 node_modules\dsh-paperdepot；link 安装时换成仓库根目录的 requirements.txt）
 5. 以上完成后告诉我「请重启 DSH」。我重启后，你再用当前 DSH 的 Web GUI 地址检查：
    - GET <DSH地址>/paperdepot/api/health 应返回 ok:true、pluginVersion 有值
    - GET <DSH地址>/paperdepot/api/setup/status 看 hasKey、pythonKey.ok、vaultReady 是否正常
@@ -83,7 +83,7 @@ https://github.com/HUAWEIYYLS/paperdepot
 
 | 现象 | 先看 |
 |---|---|
-| 左侧栏没有「论文库」 | profile 的 `cordis.patch.yml` 里 `name:` 是否是裸包名 `paperdepot`；`node_modules\paperdepot` 是否存在；然后重启 DSH |
+| 左侧栏没有「论文库」 | profile 的 `cordis.patch.yml` 里 `name:` 是否是裸包名 `dsh-paperdepot`；`node_modules\dsh-paperdepot` 是否存在；然后重启 DSH |
 | health 通了但面板不在 | 同上，基本就是 `name` 写错 |
 | 导入报 Python 相关错误 | `python --version` 是否 >= 3.10；`pip install -r requirements.txt` 是否装到了同一个解释器 |
 | 面板显示 MinerU 已配置，导入却报未配置 key | 0.1.2 及更早安装态的已知路径 bug；升级到含修复版本，或给 DSH 进程设 `MINERU_API_KEY` 后重启。`setup/status` 的 `pythonKey.ok` 可直接看 Python 侧是否读到 |

@@ -31,10 +31,10 @@ It handles ingestion and organization; Obsidian only stores and reads.
 ## Quick start
 
 1. Install DSH Desktop and create/open an Obsidian vault (keep the path short).
-2. Install the plugin — published on npm as `paperdepot`:
+2. Install the plugin — published on npm as `dsh-paperdepot` (renamed from `paperdepot` in 0.2.0):
    ```powershell
    cd "$env:USERPROFILE\.dsh\profiles\desktop"
-   pnpm add paperdepot
+   pnpm add dsh-paperdepot
    ```
    or pick the GitHub Release tarball / source link. Prefer not to run commands yourself?
    Hand the [one-prompt installer](https://github.com/HUAWEIYYLS/paperdepot/blob/main/docs/install-prompt.md) to DSH.

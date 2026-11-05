@@ -59,7 +59,7 @@ for (const f of files) {
   }
 }
 if (parsed.size > 2 * 1024 * 1024) errors.push(`包体积过大：${parsed.size} bytes`)
-if (pkg.name !== 'paperdepot') errors.push(`package.json name 不是 paperdepot：${pkg.name}`)
+if (pkg.name !== 'dsh-paperdepot') errors.push(`package.json name 不是 dsh-paperdepot：${pkg.name}`)
 
 if (errors.length) {
   console.error('❌ 包内容检查失败：')

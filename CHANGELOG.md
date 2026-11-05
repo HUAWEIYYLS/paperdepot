@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-05
+
+### Changed
+
+- **破坏性：npm 包名 / DSH 安装名由 `paperdepot` 改为 `dsh-paperdepot`**，与 DSH 社区插件
+  命名习惯一致（awesome-dsh-plugin 中多数条目以 `dsh-` 开头）。新包从 0.2.0 起发布；
+  旧包 `paperdepot@0.1.3` 不再更新，只做 deprecate 提示。
+- **功能、API、数据全部不变**：HTTP 路由仍是 `/paperdepot/api/*`，配置/缓存仍在
+  `~/.dsh/paperdepot/`，环境变量仍是 `PAPERDEPOT_*`，Obsidian 库、MinerU key 与面板状态
+  都不需要迁移。本次只改安装名。
+
+### 升级必读（0.1.x → 0.2.0）
+
+```powershell
+cd "$env:USERPROFILE\.dsh\profiles\desktop"
+pnpm remove paperdepot
+pnpm add dsh-paperdepot@0.2.0
+```
+
+然后把 profile `cordis.patch.yml` 里的 `name: paperdepot` 改成 `name: dsh-paperdepot`
+（`id: paperdepot` 可以保留），重启 DSH。dshmarket 的自动更新按包名比对，改名后需要做一次
+上面这次手动迁移，之后恢复一键更新。
+
 ## [0.1.3] - 2026-11-05
 
 ### Fixed
