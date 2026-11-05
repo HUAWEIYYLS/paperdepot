@@ -57,6 +57,19 @@ git push origin main
 > 账号开了 2FA 时普通 token 发布会被 403 拒绝。首次发布还要先在本机 `npm login`
 > 或用 token 手工 `npm publish` 一次，把包名占住。
 
+> **npm staged publishing（分阶段发布）**：如果账号启用了该策略，`npm publish` 只会把版本放进
+> staging；**新包会先公开一个 `0.0.0-stage` 占位版本**，真正的 `X.Y.Z` 在 registry 上不可见，
+> 直到维护者用 2FA 批准。`release.yml` 的 npm 步骤仍会显示 success（它只负责提交 staging）。
+> 批准方式（二选一）：
+>
+> - npmjs.com 登录 → 包页面 → **Staged Packages** 标签 → 选中版本 → **Approve**（需 2FA）；
+> - npm CLI **>= 11.15.0**：`npm stage list <包名>` 查 stage id，`npm stage approve <stage-id>`
+>   （需 2FA）。
+>
+> 批准前不要更新 `market/index.json` 的 npm 源，也不要对外宣布该版本，否则用户安装会 404。
+> 若不想每次手动批准，可在 npm 账号设置里关闭 staged publishing，或继续用 GitHub Release
+> tarball 作为发布渠道。
+
 > 首次发布需在 npm 上创建包并配置 `NPM_TOKEN`（Automation token，勾选 publish 权限）。
 > 若没有 npm 账号，可先只发 GitHub Release tarball：`release.yml` 在 `NPM_TOKEN` 为空时会
 > 跳过 npm 发布步骤，其余步骤照常执行；npm/市场后续补。
