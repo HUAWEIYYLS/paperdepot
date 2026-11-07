@@ -35,8 +35,10 @@ if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 FM_RE = re.compile(r'^---\s*\n(.*?)\n---\s*\n', re.S)
-# make_nav.py 生成的导航块：重建 index.md 时要保留
-NAV_BLOCK_RE = re.compile(r'<!-- paperdepot:nav:start -->.*?<!-- paperdepot:nav:end -->', re.S)
+# make_nav.py / make_references.py 生成的标记块：重建 index.md 时全部保留。
+# 用 backreference 保证 start / end 是同一类标记，避免误配。
+MARKER_BLOCK_RE = re.compile(
+    r'<!-- paperdepot:([\w-]+):start -->.*?<!-- paperdepot:\1:end -->', re.S)
 # tags.md 的四类小节
 TAG_SECTIONS = {
     '研究领域': '领域',
@@ -255,7 +257,8 @@ def apply_one(vault: str, entry_dir_name: str) -> bool:
         tags = parse_tags_md(io.open(lp(tp), encoding='utf-8', errors='replace').read())
 
     new_index = rebuild_index(entry_dir, summary, tags)
-    # 保留 make_nav.py 写入的导航块（概念/分类链接），避免重建后丢失
+    # 保留 make_nav / make_references 写入的所有标记块，避免重建后丢失。
+    # 不能只保留 nav：旧逻辑会把 refs 等新标记块一起抹掉。
     idx_path = os.path.join(entry_dir, 'index.md')
     old_text = ''
     if os.path.isfile(lp(idx_path)):
@@ -263,9 +266,15 @@ def apply_one(vault: str, entry_dir_name: str) -> bool:
             old_text = io.open(lp(idx_path), encoding='utf-8', errors='replace').read()
         except OSError:
             old_text = ''
-    nav = NAV_BLOCK_RE.search(old_text)
-    if nav:
-        new_index = new_index.rstrip() + '\n\n' + nav.group(0) + '\n'
+    markers = []
+    seen = set()
+    for m in MARKER_BLOCK_RE.finditer(old_text):
+        block = m.group(0)
+        if block not in seen:
+            seen.add(block)
+            markers.append(block)
+    if markers:
+        new_index = new_index.rstrip() + '\n\n' + '\n\n'.join(markers) + '\n'
     io.open(lp(idx_path), 'w', encoding='utf-8').write(new_index)
 
     # 清理临时文件（内容已并入 index.md）

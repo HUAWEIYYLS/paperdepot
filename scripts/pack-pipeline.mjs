@@ -17,6 +17,7 @@ const TOOLS = [
   'fetch_metadata.py',
   'doi_from_pdf.py',
   'build_entry.py',
+  'make_references.py',
   'make_digest.py',
   'apply_summary.py',
   'apply_tagmap.py',

@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- 参考文献在线补全（L1）：`full.md` 里没有可用参考文献段、但条目有 DOI / arXiv 时，
+  依次问 Semantic Scholar `references` 与 Crossref `reference[]`，把结构化结果写进
+  `references.md`（frontmatter `source: "s2" | "crossref"`，正文注明「机器整理」）。
+  单篇 12 秒总时限、S2 被 429 后整轮跳过、结果按 DOI/arXiv 推导的 hash 幂等，
+  失败静默回退不影响入库；`--online` / `--offline` / `PAPERDEPOT_NO_ONLINE_REFS=1` 可控制。
+- `verify_vault.py` 三件事：
+  - `--json`：输出机器可读报告（entries / summary / duplicates / fixPlan）；
+  - 忽略列表：`--ignore <条目>`、`--ignore-all`、`--unignore`、`--unignore-all`、
+    `--list-ignored`，落在 `<vault>/.paperdepot/verify.json`；**只忽略警告，不忽略错误**；
+  - `--fix-duplicates [--apply]`：只处理 `paper.pdf` 字节完全相同的重复（默认 dry-run，
+    `--apply` 才移动到 `0-Inbox/.paperdepot-dupes/<时间戳>/` 隔离，可恢复）；
+    DOI 相同但 PDF 不同的只列出来交人工判断（可能是预印本/正式版或 DOI 误配）。
+- 摘要模型可在面板选：配置卡新增「摘要模型」provider / 模型下拉（读宿主注册路由与
+  `listModels` 目录），保存到 `~/.dsh/paperdepot/config/paperdepot.local.json`，优先于
+  profile 插件 config；新增 `GET /paperdepot/api/models`、`POST /paperdepot/api/setup/llm`。
+  `deepseek-account` 被拒绝，默认仍为 `opencode-go / deepseek-v4.1-flash`。
+
+### Fixed
+
+- 深色模式下 `<select>` 展开的选项列表是浅底白字（浏览器按 option 自身样式绘制，
+  不继承 select），导致「看不见选项」。现在所有 option 显式使用主题背景/文字色，
+  select 也补了 `colorScheme: dark light` 让原生弹层跟随深色。
+- 参考文献提取：写入 `1-Papers/<条目>/references.md`（纯规则解析 `full.md` 的
+  References / 参考文献段，不调 LLM），并自动在 `index.md` 末尾维护
+  `<!-- paperdepot:refs:start -->` 入口；支持 DOI / arXiv 链接、脚注归「注释」、
+  `--all` 批量补齐与幂等 SKIP。新增 CLI `python tools/make_references.py`。
+
+### Fixed
+
+- `apply_summary.py` 重建 `index.md` 时只保留 nav 块，会把 references 等其它
+  `<!-- paperdepot:*:start/end -->` 标记块一并抹掉；现在按原顺序保留全部标记块。
+
 ## [0.2.0] - 2026-11-05
 
 ### Changed

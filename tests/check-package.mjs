@@ -20,6 +20,7 @@ const REQUIRED = [
   'THIRD_PARTY_NOTICES.md',
   'requirements.txt',
   'pipeline/tools/ingest.py',
+  'pipeline/tools/make_references.py',
   'pipeline/tools/apply_summary.py',
   'pipeline/tools/validate_summary.py',
   'pipeline/config/SKILL.md',

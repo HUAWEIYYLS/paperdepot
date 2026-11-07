@@ -255,6 +255,20 @@ def build_entry(meta: dict, parsed: dict, pdf_path: str,
     io.open(lp(os.path.join(dst, 'index.md')), 'w', encoding='utf-8').write(
         build_index_md(meta, parsed, fig_count))
 
+    # 3.5) 参考文献（纯规则；失败只告警，绝不影响入库）
+    # 必须放在 index.md 写完之后：build_for_entry 要往 index.md 末尾维护 refs 标记块。
+    refs_info = None
+    try:
+        import make_references
+        refs_info = make_references.build_for_entry(dst, title, full_md=new_md)
+        if refs_info.get('ok'):
+            print('      参考文献: %d 条%s' % (
+                refs_info.get('count', 0), '（已存在，SKIP）' if refs_info.get('skipped') else ''))
+        else:
+            print('      ⚠ 参考文献未生成: %s' % refs_info.get('reason'))
+    except Exception as exc:
+        print(f'      ⚠ 参考文献未生成: {exc}')
+
     # 4) 内部清单（点开头，Obsidian 不索引）
     entry = {
         'slug': slug,
@@ -269,6 +283,7 @@ def build_entry(meta: dict, parsed: dict, pdf_path: str,
         'chars': parsed.get('md_chars'),
         'meta_source': meta.get('source'),
         'doi': meta.get('doi', ''),
+        'refs': refs_info,
         'built_at': __import__('time').strftime('%Y-%m-%dT%H:%M:%S'),
     }
     io.open(lp(os.path.join(dst, '.entry.json')), 'w', encoding='utf-8').write(
@@ -276,5 +291,5 @@ def build_entry(meta: dict, parsed: dict, pdf_path: str,
 
     return {'slug': slug, 'skipped': False, 'title': title, 'year': year,
             'figures': fig_count, 'pages': parsed.get('layout_pages'),
-            'doi': meta.get('doi', ''), 'unref': unref,
+            'doi': meta.get('doi', ''), 'unref': unref, 'refs': refs_info,
             'needs_meta': meta.get('source') == 'mineru-fallback'}

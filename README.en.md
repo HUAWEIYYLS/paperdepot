@@ -12,10 +12,16 @@ It handles ingestion and organization; Obsidian only stores and reads.
 
 - Import PDFs by drag-and-drop, file picker, or local path (deduplicated by fingerprint).
 - Parse with MinerU, resolve metadata via Crossref / arXiv.
+- Extract the references section from `full.md` into `references.md` with rule-based parsing
+  (no LLM; DOI / arXiv links added; entry kept in original order) and link it from `index.md`.
+  When `full.md` has no usable references section, the entry's DOI / arXiv is looked up online
+  (Semantic Scholar, then Crossref); failures fall back silently, and `--offline` disables it.
 - Generate a structured Chinese summary and four controlled tag categories with an LLM;
+  the model is picked in the settings card (provider + model from the host's catalog;
+  defaults to `opencode-go / deepseek-v4.1-flash`, `deepseek-account` is not allowed);
   re-run per paper, or **backfill in batch** (queued, stoppable, and resumable — finished
   entries are skipped on the next run).
-- Write Obsidian-native frontmatter, `index.md`, `full.md`, `paper.pdf`, and `images/`.
+- Write Obsidian-native frontmatter, `index.md`, `full.md`, `paper.pdf`, `references.md`, and `images/`.
 - Browse overview / papers / concepts in the DSH sidebar panel, with a typeset reader
   (headings, lists, tables, inline math and wikilinks instead of raw Markdown).
 - Generate taxonomy pages and paper navigation blocks; export a read-only mobile edition.

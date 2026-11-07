@@ -20,6 +20,10 @@ PDF
 
 - **拖 PDF 入库**：拖拽、选择文件或粘贴本地路径；同一 PDF 按指纹自动跳过。
 - **自动元数据**：优先读 PDF 首页 DOI / arXiv 号，再走 Crossref / arXiv 精确查询。
+- **参考文献提取**：从 `full.md` 的「References / 参考文献」段生成 `references.md`
+  （纯规则、不调 LLM），保留原文顺序并补 DOI / arXiv 链接；`index.md` 末尾加入口，
+  支持单篇重跑与 `--all` 批量补齐。原文没有规范文献段的条目，可用 DOI / arXiv 在线
+  补全（Semantic Scholar → Crossref，失败静默回退，不联网也行）。
 - **结构化摘要与标签**：LLM 生成中文摘要和四类受控标签（领域 / 方法 / 应用 / 仪器），
   支持单篇补跑与「批量补摘要」（排队跑完待生成条目，可随时停止，再点会跳过已完成的继续）。
 - **Obsidian 原生体验**：元数据写进 frontmatter，Properties / Dataview / 标签面板 / 双链 / Graph 直接可用。
@@ -134,8 +138,10 @@ pnpm add "link:D:\path\to\paperdepot"
    如果你是通过 npm 安装的，`requirements.txt` 在插件包的 `pipeline/` 目录里；
    面板的配置卡会显示当前流水线路径。
 
-4. **摘要模型（可选）**：在 profile 的插件配置里设置 `provider` / `model`；
-   不设置时使用宿主默认模型。没有可用模型也能入库，只是摘要/标签会处于「待生成」。
+4. **摘要模型（可选）**：配置卡里直接选「provider / 模型」（下拉来自宿主注册的路由与模型目录），
+   保存后写进 `~/.dsh/paperdepot/config/paperdepot.local.json`，以面板设置为准；也可以在 profile
+   的插件 config 里设 `provider` / `model`。`deepseek-account` 不允许使用。不选时默认
+   `opencode-go / deepseek-v4.1-flash`。
 
 配置卡随时可以从右上角的「MinerU 已配置 / 未配置」按钮打开。
 
@@ -149,6 +155,8 @@ pnpm add "link:D:\path\to\paperdepot"
 | 看统计 | 面板「总览」页 |
 | 搜索条目 | 面板「论文」页；点开可看 `index.md` 原文、在 Obsidian 打开 |
 | 补摘要 | 论文页里对「待生成」条目点「生成摘要与标签」 |
+| 补参考文献 | `python tools/make_references.py --vault "<库路径>" --entry "<条目目录名>"`；批量用 `--all`（重复跑会 SKIP）。`full.md` 没有文献段的条目会自动用 DOI/arXiv 在线补全，加 `--offline` 可禁用；对已生成的条目加 `--force` 可在 S2 恢复可用后把 Crossref 结果升级为 S2 结果 |
+| 体检论文库 | `python tools/verify_vault.py --vault "<库路径>"`；`--json` 出机器可读报告，`--ignore <条目>` 压掉已知警告，`--fix-duplicates [--apply]` 隔离 PDF 完全相同的重复 |
 | 批量补摘要 | 顶栏「批量补摘要（N）」：把待生成条目排队跑完，底部显示进度、可「停止」；中断后再点会跳过已完成的继续（断点续跑） |
 | 看概念 | 面板「概念」页；概念页是跨论文综合，由你或 LLM 维护 |
 | 看关系图 | 在 Obsidian 里用原生 Graph / Local Graph；论文页导航块提供概念/分类边 |
@@ -177,7 +185,7 @@ pnpm add "link:D:\path\to\paperdepot"
 | `dataRoot` | `<homeRoot>/cache` | 缓存 / digest / 收件箱 |
 | `toolsDir` | `<仓库>/tools` 或 `<插件包>/pipeline/tools` | Python 流水线 |
 | `python` | `python` | 跑流水的解释器；macOS/Linux 可填 `python3` |
-| `provider` / `model` | 宿主默认 / `opencode-go` | 摘要模型路由 |
+| `provider` / `model` | `opencode-go` / `deepseek-v4.1-flash` | 摘要模型路由；优先用面板里保存的值 |
 | `autoSummarize` | `true` | 导入后是否自动生成摘要/标签 |
 
 环境变量：
