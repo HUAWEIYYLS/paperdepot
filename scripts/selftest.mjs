@@ -36,8 +36,9 @@ async function call(method, p, body) {
   req.method = method
   if (body) {
     Object.assign(req, { headers: {} })
+    const payload = Buffer.isBuffer(body) ? body : Buffer.from(typeof body === 'string' ? body : JSON.stringify(body))
     setTimeout(() => {
-      req.emit('data', body)
+      req.emit('data', payload)
       req.emit('end')
     }, 0)
   }
@@ -111,6 +112,13 @@ check(
   `hasKey=${setup.json.hasKey} python=${setup.json.python && setup.json.python.version}`,
 )
 check('GET /setup/status 识别文件里的 key', setup.json.hasKey === true, `keySource=${setup.json.keySource}`)
+check(
+  'GET /setup/status 带摘要模型信息',
+  setup.json.llm && setup.json.llm.provider && setup.json.llm.model,
+  JSON.stringify(setup.json.llm),
+)
+const llmBad = await call('POST', '/paperdepot/api/setup/llm', { provider: 'deepseek-account', model: 'x' })
+check('POST /setup/llm 拒绝 deepseek-account', llmBad.status === 400 && llmBad.json.ok === false)
 if (setup.json.python && setup.json.python.ok) {
   check(
     'Python 流水线读到同一份 key（宿主/子进程路径一致）',
@@ -325,6 +333,13 @@ check('client 含错误边界', clientSrc.includes('getDerivedStateFromError'))
 check('client 含 Obsidian 跳转（走宿主）', clientSrc.includes('/paperdepot/api/open-obsidian') && !clientSrc.includes("window.open('obsidian://"))
 check('host 含 open-obsidian 路由', implSrc.includes('/paperdepot/api/open-obsidian') && implSrc.includes('FileProtocolHandler'))
 check('client 含批量补摘要入口与进度条', clientSrc.includes('/summarize-pending') && clientSrc.includes('批量补摘要'))
+check(
+  'client 下拉选项带深色主题样式（option 显式背景/文字色）',
+  clientSrc.includes('const OPTION_STYLE') &&
+    clientSrc.includes('style: OPTION_STYLE') &&
+    (clientSrc.match(/h\('option'/g) || []).length === 1,
+)
+check('client 含摘要模型选择器', clientSrc.includes('/paperdepot/api/models') && clientSrc.includes('/setup/llm'))
 check('host 含批量补摘要 / 停止任务路由', implSrc.includes('/paperdepot/api/summarize-pending') && implSrc.includes('/paperdepot/api/job-cancel'))
 check(
   'client 论文/概念详情走 Markdown 排版',
