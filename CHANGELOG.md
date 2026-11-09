@@ -38,6 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- 图谱被自动生成的目录/统计页抢占中心：`1-Papers/_index.md` 一个页面就有 190 条
+  边，力导向布局会把它推到正中，真正的分类枢纽反而偏到一边。`make_obsidian_graph.py`
+  现在把 `_index.md` / `_stats.md`（论文索引、统计、分类索引、概念索引）写进
+  `search` 过滤器排除，中心回到分类页。新增 `tests/test_make_obsidian_graph.py`。
 - `apply_summary.py` 重建 `index.md` 时只保留 nav 块，会把 references 等其它
   `<!-- paperdepot:*:start/end -->` 标记块一并抹掉；现在按原顺序保留全部标记块。
 

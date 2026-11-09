@@ -10,6 +10,10 @@ make_obsidian_graph — 给 Obsidian 原生图视图写入「颜色分组 + 过�
     这个脚本把「按领域上色、概念页高亮、隐藏缓存/重复区、待补元数据标橙」
     写进 <vault>/.obsidian/graph.json，让原生图直接变成可读的分类视图。
 
+    生成的目录/统计页（`_index.md` / `_stats.md`）不参与图：它们连向全部条目，
+    会把力导向布局的中心抢走，让真正的分类枢纽看不出来，所以用 `search`
+    过滤器排除（见 INDEX_EXCLUDED / GRAPH_SEARCH）。
+
 Obsidian graph.json 关键结构（实测）：
     {
       "showTags": false,          # 关掉标签节点（176 个标签会变毛球）
@@ -67,6 +71,17 @@ TAXONOMY_COLOR = '#ffd700'  # 分类页：金（3-Taxonomy/ 文件夹）
 INDEX_COLOR = '#555555'     # 索引/统计：深灰
 PENDING_COLOR = '#c0392b'   # 待补元数据：红
 FALLBACK_COLOR = '#909090'  # 其它论文：灰
+
+# 生成的目录/统计页连向全部条目（_index 一个页面就有 190 条边），会在力导向
+# 布局里抢走视觉中心，让真正的分类枢纽偏到一边。它们不是知识结构的一部分，
+# 所以默认从图里排除。
+INDEX_EXCLUDED = (
+    '-path:1-Papers/_index.md',
+    '-path:1-Papers/_stats.md',
+    '-path:3-Taxonomy/_index.md',
+    '-path:2-Concepts/_index.md',
+)
+GRAPH_SEARCH = ' '.join(('-path:_duplicates/',) + INDEX_EXCLUDED)
 
 
 def hx(c):
@@ -160,7 +175,7 @@ def main():
         'showAttachments': False,
         'hideUnresolved': True,
         'showOrphans': True,      # 没进概念层的论文也显示在外圈
-        'search': '-path:_duplicates/',
+        'search': GRAPH_SEARCH,
         'showArrow': False,
         'textFadeMultiplier': 0,
         'nodeSizeMultiplier': 1,
