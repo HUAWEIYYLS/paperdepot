@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- 库内引用（引文 → 论文 wikilink）：`make_references.py` 生成 `references.md` 时，把
+  引文标题匹配回库里已收录的论文，在 `index.md` 写 `<!-- paperdepot:cites:start -->`
+  标记块（`## 🔗 库内引用（N 篇）`），让图谱出现真正的「论文 → 论文」引用边——这是
+  文献库最有信息量的一类边，而 references.md 里的引文原本只是纯文本。
+  匹配只用目录名 / frontmatter `title`，**不用 aliases**（`blind deconvolution`、
+  `最优提取` 这类宽泛别名会把无关引文吸进来）；长标题要求整串出现在引文中，
+  短标题必须被引文引号完整括起，每条引文只认最长的一个目标。
+  `--no-cites` 可关闭；`apply_summary.py` 重建 `index.md` 时按标记块保留。
 - 参考文献在线补全（L1）：`full.md` 里没有可用参考文献段、但条目有 DOI / arXiv 时，
   依次问 Semantic Scholar `references` 与 Crossref `reference[]`，把结构化结果写进
   `references.md`（frontmatter `source: "s2" | "crossref"`，正文注明「机器整理」）。

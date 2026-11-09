@@ -708,6 +708,161 @@ def _upsert_refs_marker(index_path, count):
     return text.rstrip() + '\n\n' + block + '\n'
 
 
+# ── 库内引用匹配：把引文连回库里已收录的论文 ─────────────────────────
+# 文献库里最有信息量的边是「论文 → 论文」（引用关系）。references.md 里的引文
+# 是纯文本，图谱看不到这些边，所以这里在 index.md 写一个 cites 标记块，把命中的
+# 库内论文变成 wikilink。标记块由 apply_summary 的 MARKER_BLOCK_RE 保留。
+CITES_MARKER_RE = re.compile(
+    r'<!-- paperdepot:cites:start -->.*?<!-- paperdepot:cites:end -->', re.S)
+# 匹配只用「目录名 / frontmatter title」，不用 aliases：alias 常是「最优提取」
+# 「blind deconvolution」这种宽泛词组，会把任何含该词组的引文都吸过来。
+# 纯包含匹配要求标题够长、词够多；短标题只有在引文里被引号完整括起时才算命中。
+CITES_MIN_TITLE = 25
+CITES_MIN_WORDS = 4
+CITES_QUOTED_MIN = 10
+TITLE_INDEX_CACHE = {}
+QUOTE_RE = re.compile(r'[“"「『]([^”"」』]{6,})[”"」』]')
+
+
+def _norm_title(text):
+    """把标题/引文归一成可比较形式：去公式、去转义、去标点、压空白、转小写。"""
+    s = text or ''
+    s = re.sub(r'\$[^$]*\$', ' ', s)
+    s = s.replace('\\', ' ')
+    s = re.sub(r'[^\w]+', ' ', s, flags=re.UNICODE)
+    return re.sub(r'\s+', ' ', s).strip().lower()
+
+
+def _title_variants(index_path, dir_name):
+    """一个条目可被引文命中的标题写法：目录名 + frontmatter title（不含 aliases）。"""
+    out = [dir_name]
+    m = re.match(r'^---\s*\n(.*?)\n---\s*\n', _read_text(index_path), re.S)
+    if m:
+        t = re.search(r'^title:\s*["\']?(.+?)["\']?\s*$', m.group(1), re.M)
+        if t:
+            out.append(t.group(1).strip().strip('"\''))
+    return out
+
+
+def _quoted_norms(text):
+    """引文里被引号完整括起的片段（归一化）——引号本身就是「这是标题」的信号。"""
+    return [n for n in (_norm_title(m) for m in QUOTE_RE.findall(text or '')) if n]
+
+
+def vault_title_index(vault):
+    """vault → [(目录名, 归一化标题, 展示标题)]；按库路径缓存，--all 只扫一次。"""
+    if not vault:
+        return []
+    key = os.path.abspath(vault)
+    if key in TITLE_INDEX_CACHE:
+        return TITLE_INDEX_CACHE[key]
+    rows = []
+    seen = set()
+    for entry_dir in _iter_entries(key):
+        dir_name = os.path.basename(entry_dir)
+        index_path = os.path.join(entry_dir, 'index.md')
+        if not os.path.isfile(lp(index_path)):
+            continue
+        display = read_title(index_path)
+        for cand in _title_variants(index_path, dir_name):
+            norm = _norm_title(cand)
+            if len(norm) < CITES_QUOTED_MIN:
+                continue
+            if (dir_name, norm) in seen:
+                continue
+            seen.add((dir_name, norm))
+            rows.append((dir_name, norm, display))
+    TITLE_INDEX_CACHE[key] = rows
+    return rows
+
+
+def _strong_match(norm):
+    """够长、够多词才允许「整串出现在引文任意位置」这种弱证据匹配。"""
+    return len(norm) >= CITES_MIN_TITLE and len(norm.split()) >= CITES_MIN_WORDS
+
+
+def match_in_vault(entries, vault, self_dir=''):
+    """
+    把引文条目匹配回库内论文。
+
+    每条引文只认一个目标（取命中的最长标题）：一条引文就是一本书/一篇文章，
+    取最长能避开「标题 A 是标题 B 子串」造成的重复命中。
+    证据强度：引号内完整等强于「整串出现在句中」，短标题只接受前者。
+    返回 [(目录名, 展示标题)]，按引文顺序去重。
+    """
+    index = vault_title_index(vault)
+    if not index:
+        return []
+    hits = []
+    seen = set()
+    for entry in entries:
+        raw = entry.get('text') or ''
+        text = _norm_title(raw)
+        if len(text) < CITES_QUOTED_MIN:
+            continue
+        quoted = _quoted_norms(raw)
+        best = None
+        best_rank = 0
+        for dir_name, norm, display in index:
+            if dir_name == self_dir or dir_name in seen:
+                continue
+            if norm in quoted:
+                rank = 2
+            elif _strong_match(norm) and norm in text:
+                rank = 1
+            else:
+                continue
+            # 先比证据强度，再比标题长度（长标题更具体）
+            if rank > best_rank or (rank == best_rank and (best is None or len(norm) > len(best[1]))):
+                best = (dir_name, norm, display)
+                best_rank = rank
+        if best is not None:
+            seen.add(best[0])
+            hits.append((best[0], best[2]))
+    return hits
+
+
+
+def _cites_block(hits):
+    """生成 cites 标记块；没有命中时返回空串（调用方负责移除旧块）。"""
+    if not hits:
+        return ''
+    lines = [
+        '<!-- paperdepot:cites:start -->',
+        '## 🔗 库内引用（%d 篇）' % len(hits),
+        '',
+    ]
+    for dir_name, display in hits:
+        alias = str(display or dir_name).replace('|', '｜').replace(']]', '')
+        lines.append('- [[1-Papers/%s/index|%s]]' % (dir_name, alias))
+    lines.append('<!-- paperdepot:cites:end -->')
+    return '\n'.join(lines)
+
+
+def _cites_dirty(text, block):
+    """现有 index.md 的 cites 块是否需要重写。"""
+    m = CITES_MARKER_RE.search(text)
+    if not block:
+        return m is not None
+    if m is None:
+        return True
+    return m.group(0).strip() != block.strip()
+
+
+def _upsert_cites(text, block):
+    """在 index.md 文本里写入 / 替换 / 移除 cites 标记块。"""
+    if not block:
+        if not CITES_MARKER_RE.search(text):
+            return text
+        stripped = CITES_MARKER_RE.sub('', text)
+        stripped = re.sub(r'\n{3,}', '\n\n', stripped)
+        return stripped.rstrip() + '\n'
+    if CITES_MARKER_RE.search(text):
+        return CITES_MARKER_RE.sub(lambda _m: block, text)
+    return text.rstrip() + '\n\n' + block + '\n'
+
+
+
 def read_title(index_path):
     """从 index.md frontmatter / 一级标题取标题，供 CLI 使用。"""
     text = _read_text(index_path)
@@ -724,18 +879,25 @@ def read_title(index_path):
     return os.path.basename(os.path.dirname(index_path))
 
 
-def build_for_entry(entry_dir, title, full_md=None, force=False, online=None):
+def build_for_entry(entry_dir, title, full_md=None, force=False, online=None,
+                    vault=None, cites=True):
     """
-    生成 <entry_dir>/references.md 并维护 index.md 的 refs 标记块。
+    生成 <entry_dir>/references.md 并维护 index.md 的 refs / cites 标记块。
 
     full_md: 已读好的 full.md 文本；为 None 时从 entry_dir/full.md 读取。
     online:  None=自动（离线失败且有条目 DOI/arXiv 时联网补全）
              True=允许联网；False=只用离线
-    返回 dict（ok / skipped / reason / count / hash / source / path）；失败不抛异常。
+    vault:   库根目录；None 时从 entry_dir 反推（1-Papers/<条目> → 库根）
+    cites:   是否把引文匹配回库内论文（写 cites 标记块）
+    返回 dict（ok / skipped / reason / count / hash / source / cites / path）；失败不抛异常。
     """
     entry_dir = os.path.abspath(entry_dir)
     refs_path = os.path.join(entry_dir, 'references.md')
     index_path = os.path.join(entry_dir, 'index.md')
+    if vault is None:
+        # entry_dir 形如 <vault>/1-Papers/<条目>
+        vault = os.path.dirname(os.path.dirname(entry_dir))
+    self_dir = os.path.basename(entry_dir)
 
     if full_md is None:
         full_path = os.path.join(entry_dir, 'full.md')
@@ -752,16 +914,24 @@ def build_for_entry(entry_dir, title, full_md=None, force=False, online=None):
 
     def _finish(parsed, source):
         parsed['source'] = source
-        if not force and has_meta and has_marker:
+        hits = match_in_vault(parsed['entries'], vault, self_dir) if cites else []
+        block = _cites_block(hits)
+        current = _read_text(index_path)
+        if (not force and has_meta and has_marker
+                and not _cites_dirty(current, block)):
             if meta['hash'] == parsed['hash'] and meta['source'] == source:
                 return {'ok': True, 'skipped': True, 'count': parsed['count'],
-                        'hash': parsed['hash'], 'source': source, 'path': refs_path}
+                        'hash': parsed['hash'], 'source': source, 'cites': len(hits),
+                        'path': refs_path}
         _atomic_write(refs_path, render_references(title, parsed))
         new_index = _upsert_refs_marker(index_path, len(parsed['entries']))
+        new_index = _upsert_cites(new_index, block)
         if new_index:
             _atomic_write(index_path, new_index)
         return {'ok': True, 'skipped': False, 'count': len(parsed['entries']),
-                'hash': parsed['hash'], 'source': source, 'path': refs_path}
+                'hash': parsed['hash'], 'source': source, 'cites': len(hits),
+                'path': refs_path}
+
 
     # 1) 离线（full.md 有规范参考文献段）——绝大多数条目走这里，不联网
     parsed = parse_references(full_md)
@@ -829,6 +999,8 @@ def main():
     ap.add_argument('--offline', action='store_true', help='只用 full.md，不联网')
     ap.add_argument('--doi', default='', help='配合 --from-files：直接给 DOI 试在线补全')
     ap.add_argument('--arxiv', default='', help='配合 --from-files：直接给 arXiv id 试在线补全')
+    ap.add_argument('--no-cites', action='store_true',
+                    help='不把引文匹配回库内论文（不写 index.md 的 cites 标记块）')
     args = ap.parse_args()
 
     if args.online and args.offline:
@@ -892,9 +1064,11 @@ def main():
             print('条目不存在：%s' % entry_dir, file=sys.stderr)
             return 2
         title = read_title(os.path.join(entry_dir, 'index.md'))
-        res = build_for_entry(entry_dir, title, force=args.force, online=online)
+        res = build_for_entry(entry_dir, title, force=args.force, online=online,
+                              vault=args.vault, cites=not args.no_cites)
         if res['ok']:
-            print('%s: %s count=%d' % (args.entry, _label(res), res['count']))
+            print('%s: %s count=%d cites=%d' % (
+                args.entry, _label(res), res['count'], res.get('cites', 0)))
             return 0
         print('%s: FAIL reason=%s' % (args.entry, res.get('reason')), file=sys.stderr)
         return 1
@@ -902,17 +1076,20 @@ def main():
     if args.all:
         ok = skip = fail = 0
         online_used = 0
+        cites_total = 0
         for entry_dir in _iter_entries(args.vault):
             name = os.path.basename(entry_dir)
             try:
                 title = read_title(os.path.join(entry_dir, 'index.md'))
-                res = build_for_entry(entry_dir, title, force=args.force, online=online)
+                res = build_for_entry(entry_dir, title, force=args.force, online=online,
+                                      vault=args.vault, cites=not args.no_cites)
             except Exception as exc:  # 单篇兜底，绝不让批量中断
                 res = {'ok': False, 'reason': 'exception: %s' % exc}
             if not res.get('ok'):
                 fail += 1
                 print('  ❌ %s  (%s)' % (name[:70], res.get('reason')))
                 continue
+            cites_total += res.get('cites', 0)
             if res.get('skipped'):
                 skip += 1
                 print('  ↷ %s  SKIP' % name[:70])
@@ -924,8 +1101,8 @@ def main():
                     name[:70], res.get('count', 0),
                     '，%s' % res['source'] if res.get('source') in ONLINE_SOURCES else ''))
         elapsed = time.time() - started
-        print('\n完成：ok=%d skip=%d fail=%d（其中在线补全 %d）  耗时 %.1f 秒' % (
-            ok, skip, fail, online_used, elapsed))
+        print('\n完成：ok=%d skip=%d fail=%d（其中在线补全 %d）  库内引用 %d 条  耗时 %.1f 秒' % (
+            ok, skip, fail, online_used, cites_total, elapsed))
         return 0 if fail == 0 else 1
 
     ap.error('需要 --entry <目录名> 或 --all')

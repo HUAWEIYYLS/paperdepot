@@ -155,11 +155,11 @@ pnpm add "link:D:\path\to\paperdepot"
 | 看统计 | 面板「总览」页 |
 | 搜索条目 | 面板「论文」页；点开可看 `index.md` 原文、在 Obsidian 打开 |
 | 补摘要 | 论文页里对「待生成」条目点「生成摘要与标签」 |
-| 补参考文献 | `python tools/make_references.py --vault "<库路径>" --entry "<条目目录名>"`；批量用 `--all`（重复跑会 SKIP）。`full.md` 没有文献段的条目会自动用 DOI/arXiv 在线补全，加 `--offline` 可禁用；对已生成的条目加 `--force` 可在 S2 恢复可用后把 Crossref 结果升级为 S2 结果 |
+| 补参考文献 | `python tools/make_references.py --vault "<库路径>" --entry "<条目目录名>"`；批量用 `--all`（重复跑会 SKIP）。`full.md` 没有文献段的条目会自动用 DOI/arXiv 在线补全，加 `--offline` 可禁用；对已生成的条目加 `--force` 可在 S2 恢复可用后把 Crossref 结果升级为 S2 结果。同时把引文标题匹配回库内论文，在 `index.md` 写「库内引用」块（论文 → 论文的引用边），`--no-cites` 可关闭 |
 | 体检论文库 | `python tools/verify_vault.py --vault "<库路径>"`；`--json` 出机器可读报告，`--ignore <条目>` 压掉已知警告，`--fix-duplicates [--apply]` 隔离 PDF 完全相同的重复 |
 | 批量补摘要 | 顶栏「批量补摘要（N）」：把待生成条目排队跑完，底部显示进度、可「停止」；中断后再点会跳过已完成的继续（断点续跑） |
 | 看概念 | 面板「概念」页；概念页是跨论文综合，由你或 LLM 维护 |
-| 看关系图 | 在 Obsidian 里用原生 Graph / Local Graph；论文页导航块提供概念/分类边。`重建导航` 会顺带写入颜色分组，并排除自动生成的目录/统计页（它们连向全部条目，留在图里会抢占中心） |
+| 看关系图 | 在 Obsidian 里用原生 Graph / Local Graph；论文页导航块提供概念/分类边，`库内引用` 块提供论文 → 论文的引用边。`重建导航` 会顺带写入颜色分组，并排除自动生成的目录/统计页（它们连向全部条目，留在图里会抢占中心） |
 | 重建分类页/导航 | 面板「重建导航」（幂等，可反复跑） |
 | 手机阅读 | `python tools/make_mobile_reader.py --vault "<库路径>" --out "<输出目录>"`，把产物放到同步盘 |
 
