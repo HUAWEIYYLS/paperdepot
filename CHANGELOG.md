@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-14
+
 ### Added
 
 - 库内引用（引文 → 论文 wikilink）：`make_references.py` 生成 `references.md` 时，把
